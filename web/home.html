@@ -14,13 +14,33 @@
 
     <div class="container">
         <h3>FHIR Ethereum Healthcare Demo</h3>
+
         <ul class="nav nav-tabs">
+            
             <li class="active"><a href="home.html">Introduction</a></li>
-            <li><a href="clinics.html">Clinics</a></li>
-            <li><a href="patients.html">Patients</a></li>
+
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="clinics.html">Clinic
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="clinics.html">General/Resgister/Update</a></li>
+                    <li><a href="/org_insert">Insert FHIR Records</a></li>
+                </ul>
+            </li>
+
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="patients.html">Patient
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="patients.html">General/Resgister/Update</a></li>
+                    <li><a href="/patient_insert">Manage FHIR</a></li>
+                </ul>
+            </li>
         </ul>
+
         <br>
     </div>
+
     <div class="container">
         <div class="jumbotron">
             <h3>Clinics</h3>
