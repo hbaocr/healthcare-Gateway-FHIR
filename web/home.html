@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>FHIR Ethereum Healthcare Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <h3>FHIR Ethereum Healthcare Demo</h3>
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="home.html">Introduction</a></li>
+            <li><a href="clinics.html">Clinics</a></li>
+            <li><a href="patients.html">Patients</a></li>
+        </ul>
+        <br>
+    </div>
+    <div class="container">
+        <div class="jumbotron">
+            <h3>Clinics</h3>
+            <ul>
+                <li>Pay Eth/Token to regist/update their info with smartcontract </li>
+                <li>Insert the FHIR records to patients if they have suitable permission </li>
+                <li>Pay Eth to service provider to update and store FHIR records</li>
+                <li>Request the permission from patients to access patients' records in certain time </li>
+                <li>Pay Eth/Token to patients to have the permission to access their FHIR records (not implement yet)</li>
+            </ul>
+
+            <h3> Patients</h3>
+            <ul>
+                <li>Pay Eth/Token to regist/update their info with smartcontract </li>
+                <li>Having full permission with their FHIR records </li>
+                <li>Forbid /Approve the Clinics' permission to access their FHIR records in certain time </li>
+            </ul>
+
+            <h3>FHIR Service Provider</h3>
+            <ul>
+                <li>Keeping the FHIR records in their server </li>
+                <li>Get Eth/token fee from submitting/updating participants' info </li>
+                <li>Base on smartcontract to verify if the requesters having the valid permission to access data </li>
+            </ul>
+            <h3>FHIR Ethereum SmartContract</h3>
+            <ul>
+                <li>Keep tracking the accesses tx from participants </li>
+                <li>Store the Id of FHIR records and their ownership</li>
+                <li>Manage on chain the permission to access the FHIR records </li>
+            </ul>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

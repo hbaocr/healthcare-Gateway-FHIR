@@ -1,0 +1,23 @@
+{
+  "name": "healthcaregatekeeperservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "cookie-parser": "^1.4.3",
+    "eth-sig-util": "^1.2.1",
+    "ethereumjs-util": "^5.1.1",
+    "ethjs": "^0.2.6",
+    "express": "^4.16.4",
+    "express-jwt": "^5.1.0",
+    "jsonwebtoken": "^7.4.3",
+    "truffle-hdwallet-provider-privkey": "^0.3.0",
+    "web3": "^1.0.0-beta.36"
+  }
+}
