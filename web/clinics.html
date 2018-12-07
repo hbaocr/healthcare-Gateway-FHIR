@@ -6,14 +6,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk="
         crossorigin="anonymous"></script>
-    <script src="/org.js"></script>
     <script src="/contract_config.js"></script>
     <script src="/dapp.js"></script>
+    <script src="/org.js"></script>
+
 </head>
 
 <body>
@@ -36,7 +38,7 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li class="active"><a href="clinics.html">General/Resgister/Update</a></li>
-                    <li><a href="/org_insert">Insert FHIR Records</a></li>
+                    <li><a onclick="on_org_fhir_management()" href='#'>Manage FHIR Records</a></li>
                 </ul>
             </li>
 
@@ -45,7 +47,7 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="patients.html">General/Resgister/Update</a></li>
-                    <li><a href="/patient_insert">Manage FHIR</a></li>
+                    <li><a onclick="on_patients_fhir_management()" href="#">Manage FHIR Records</a></li>
                 </ul>
             </li>
         </ul>
