@@ -1,8 +1,30 @@
 const server = "http://127.0.0.1:3000";
 const signed_msg="HealthcareFHIR Signature";
+var configheader = {
+    headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+    }
+};
+var signature;
 function on_org_fhir_management(){
     //alert('on_org_fhir_management');
-    eth_personal_sign
+    eth_personal_sign(signed_msg)
+    .then((_signature)=>{
+        signature =_signature;
+        let link  = server+"/submit_credential";
+
+        let from = get_selected_addr();
+        if (!from) return connect();
+        let jsdata = JSON.stringify({
+            account: from,
+            signed: _signature,
+        });
+        console.log('signature : ', jsdata);
+        return axios.post(link, jsdata, configheader)
+
+    })
+    .catch(console.error);
 }
 function on_patients_fhir_management(){
     alert('on_patients_fhir_management');
@@ -34,13 +56,13 @@ function connect() {
             .catch(console.error)
     }
 }
-function eth_personal_sign(str_msg) {
+function eth_personal_sign(msg) {
     let from = get_selected_addr();
     if (!from) return connect();
     return web3.eth.getBlockNumber()
         .then((blockcnt) => {
-            var nonce = Math.floor(blockcnt / 10);
-            str_msg = str_msg + ':' + nonce;
+            var nonce = Math.floor(blockcnt / 20);
+            let str_msg = msg + ':' + nonce;
             return web3.eth.personal.sign(str_msg, from, "");//sign through metamask
         })
 }

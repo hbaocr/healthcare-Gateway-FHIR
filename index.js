@@ -21,6 +21,7 @@ function generate_contract_info_to_webjs(){
 
 generate_contract_info_to_webjs();
 
+
 app.use("/", express.static(__dirname + '/web'));//mount root of web to 'web'
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -28,6 +29,9 @@ app.use(cookieParser());
 var app_port = 3000;
 var app_bind_ip = "0.0.0.0";
 var web3 = Dapp.setup_web3_websocket();
+
+//['/clinics_fhir.html','/submit_credential']
+
 setInterval(async() => {
    
    let cnt=await web3.eth.getBlockNumber();
@@ -38,7 +42,7 @@ function verify_signature(str_msg, sig, verifying_addr) {
     return  new Promise(function(resolve,reject){
         web3.eth.getBlockNumber()
         .then((blockcnt) => {
-            var nonce = Math.floor(blockcnt / 10);
+            var nonce = Math.floor(blockcnt / 20);
             str_msg = str_msg + ':' + nonce;
             var msgParams = {
                 data: ethUtil.bufferToHex(new Buffer(str_msg, 'utf8')),
