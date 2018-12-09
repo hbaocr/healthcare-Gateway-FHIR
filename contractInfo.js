@@ -1,4 +1,7 @@
 module.exports = {
+    msg_signed: "Healthcare Signature",
+    networdID:'122018',
+    block_interval: 100, // for signing change each interval of block ( 100 block signature change) 
     address: "0x8efd0363f5764b8b52463ec0a420731f9c81c3a3",
     abi: [
         {
