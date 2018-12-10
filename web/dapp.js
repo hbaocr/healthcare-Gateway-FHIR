@@ -18,10 +18,41 @@ window.ethereum.on('accountsChanged', function (accounts) {
     // Time to reload your interface with netId
     console.log('change network ',netId);
   })
+function toHexString(byteArray) {
+    return Array.from(byteArray, function(byte) {
+      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('')
+  }
+function my_personal_sign(msg) {
+    return new Promise((resolve, reject) => {
+        let from = web3.currentProvider.selectedAddress;
+        //let hex_str = new Buffer(msg, 'utf8').toString('hex');
+        let byteArr=new TextEncoder().encode(msg, 'utf8');
+        let web3_hex_msg = "0x" + toHexString(byteArr);
+        console.log('CLICKED, SENDING PERSONAL SIGN REQ');
+        var params = [web3_hex_msg, from]
+        var method = 'personal_sign'
+        web3.currentProvider.sendAsync({
+            method,
+            params,
+            from,
+        }, (err, result) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (result.error) {
+                reject(result.error);
+                return;
+            }
+            resolve(result.result);
+        });
+    })
+}
 
 function do_authentication(){
    //alert('on_org_fhir_management');
-   return eth_personal_sign(signed_msg)
+   return my_eth_metamask_personal_sign(signed_msg)
    .then((_signature)=>{
        signature =_signature;
        let link  = server+"/jwt_authen";
@@ -74,6 +105,33 @@ function connect() {
             .catch(console.error)
     }
 }
+
+//for web3@0.20
+function getBlockCount(){
+    return new Promise((resolve,reject)=>{
+        web3.eth.getBlockNumber((err, cnt) => { 
+            if(err){
+                reject(err)
+            }else{
+                resolve(cnt);
+            }
+         });
+    });
+}
+function my_eth_metamask_personal_sign(msg){
+    let from = get_selected_addr();
+    if (!from) return connect();
+    return getBlockCount()
+    .then((blockcnt) => {
+        let interval= MedcontractInfo.block_interval;
+        interval=(interval==0)?20:interval;
+        var nonce = Math.floor(blockcnt / interval);
+        let str_msg = msg + ':' + nonce;
+        return my_personal_sign(str_msg);//sign through metamask
+    })
+}
+
+//for web3_1.0 only
 function eth_personal_sign(msg) {
     let from = get_selected_addr();
     if (!from) return connect();
