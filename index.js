@@ -1,3 +1,4 @@
+
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var bodyParser = require('body-parser');
@@ -12,9 +13,19 @@ var fs = require('fs');
 var MedcontractInfo = require("./contractInfo");
 var config = require("./config/config");
 var app = express();
-var app_port = 3000;
+var app_port = 8000;
 var app_bind_ip = "0.0.0.0";
 var web3 = Dapp.setup_web3_websocket();
+
+var FhirApi = require("./FhirApi");
+var fhirhost = "http://127.0.0.1:3000/3_0_1/";
+var fhir = new FhirApi(fhirhost);
+// fhir.search_data_fhir(fhir.FHIRservice.ImagingStudy,searchparas).then((res)=>{
+//     console.log(res.data)
+// });
+
+
+
 
 // at first sync up with web the contract Info
 function generate_contract_info_to_webjs() {
@@ -27,6 +38,32 @@ function generate_contract_info_to_webjs() {
 generate_contract_info_to_webjs();
 
 const ProtectedRoutes = express.Router();
+
+//my middle ware to check  jwt token on cookies
+
+function checkJwtToken(req, res, next){
+    var token = req.headers['access-token'];
+    // decode token
+    if (token) {
+        // verifies secret and checks exp
+        let pass = app.get('PassJwt')
+        jwt.verify(token, pass, (err, decoded) => {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authenticate token.' });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+
+    } else {
+        return res.status(403).send({  // forbiden
+            message: 'No token provided.'
+        });
+    }
+}
+
 
 // use morgan to log requests to the console
 app.use(morgan('dev'));
@@ -127,6 +164,11 @@ app.post('/jwt_authen', function (req, res) {
     }).catch((err) => {
         res.json({ message: "Error! please check your signature !", err_code: 1 })
     })
+});
+
+//for org uppdate their info
+app.post('/org_register_update',function(reg,res){
+
 });
 
 

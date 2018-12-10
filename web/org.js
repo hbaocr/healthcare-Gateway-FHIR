@@ -7,22 +7,27 @@ window.addEventListener('load', async()=>{
 
 function display_info(){
     let _from =web3.currentProvider.selectedAddress;
-    setHTMLTag('txt_web3api', web3.version);
+    setHTMLTag('txt_web3api',"web3@"+ web3.version.api);
     setHTMLTag('txt_addr',_from );
     
-    web3.eth.getBalance(_from).then((w)=>{
+    web3.eth.getBalance(_from,(err,w)=>{
         setHTMLTag('txt_balance',w.toString())
     })
     getFee().then((w)=>{
         setHTMLTag('txt_fee',w.toString())
     })
-    web3.eth.getBlockNumber().then((data) => {
-        setHTMLTag('txt_blocknum', data);
-    })
-
+    // web3.eth.getBlockNumber((data) => {
+    //     setHTMLTag('txt_blocknum', data.toString());
+    // })
+    web3.eth.getBlockNumber((err, cnt)=>{ setHTMLTag('txt_blocknum',cnt) });
     setHTMLTag('txt_network', web3.currentProvider.networkVersion);
-    web3.eth.net.getNetworkType().then((data) => {
-        setHTMLTag('txt_type', data);
+    web3.version.getNetwork((err,data) => {
+        if(data>5){
+            setHTMLTag('txt_type', 'private');
+        }else{
+            setHTMLTag('txt_type', data);
+        }
+        
     })
 
     getOrgName(_from).then((inf)=>{
@@ -42,6 +47,8 @@ function on_org_update(){
         alert("Input organization Info before doing update");
         return;
     }
+
+    
     getFee().then((w)=>{
         document.getElementById('txt_desc').value="";
         return updateOrgRegisterInfo(inf_in,w);
@@ -54,6 +61,7 @@ function on_org_update(){
                   'Result : '+ ret;
         console.log(disp);
         alert(disp);
+
     })
     .catch(console.error);
 }

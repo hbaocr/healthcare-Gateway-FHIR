@@ -1,7 +1,11 @@
 module.exports = {
     msg_signed: "Healthcare Signature",
     networdID:'122018',
+    gateway_host : 'http://127.0.0.1:8000',
+    fhir_api     : 'http://127.0.0.1:3000/3_0_1',
     block_interval: 100, // for signing change each interval of block ( 100 block signature change) 
+    _gasLimit : 1500000,
+    _gasPrice : '20000000000',
     address: "0x8efd0363f5764b8b52463ec0a420731f9c81c3a3",
     abi: [
         {
