@@ -14,6 +14,19 @@ var FHIR_REC = require('./FhirRecords');
 var fhir_app = new FHIR(fhir_config.server);
 var fhir_record = new FHIR_REC();
 
+
+// let web_url = fhir_config.server;
+// let div_str = "hello 1 234";
+// let rec = fhir_record.create_org_json_info("test1234", "test_name", web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
+// fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization,rec).then((res)=>{
+//     console.log(res);
+// })
+// fhir_app.get_data_fhir(fhir_app.FHIRservice.Organization,"test1234").then((res)=>{
+//     console.log(res);
+// })
+
+
+
 setInterval(async () => {
     let cnt = await web3.eth.getBlockNumber();
     console.log('block cnt :', cnt);

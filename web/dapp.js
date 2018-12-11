@@ -9,13 +9,39 @@ var configheader = {
     }
 };
 var signature;
-function on_org_fhir_management() {
-    //alert('on_org_fhir_management');
-    eth_personal_sign(signed_msg)
+
+//to make sure already overide web3@0.20(built-in by metamask) by web3@1.0
+function get_web3_10(){
+    if(web3.version.api){
+        window.web3 = new Web3(ethereum);
+        setup_smartcontract();
+    }
+
+    return window.web3;
+}
+//post link inclue cookies also
+function do_http_post(js_obj, link, header_opt) {
+    let req_header = {};
+    if (header_opt) {
+        req_header = {
+            headers: header_opt
+        };
+    } else {
+        req_header = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            }
+        };
+    }
+    return axios.post(link, js_obj, req_header);
+}
+
+
+function req_authen_jwt_cookies() {
+    return eth_personal_sign(signed_msg)
         .then((_signature) => {
             signature = _signature;
-           
-
             let from = get_selected_addr();
             if (!from) return connect();
             let jsdata = JSON.stringify({
@@ -26,18 +52,22 @@ function on_org_fhir_management() {
             let link = server + "/jwt_authen";
             return axios.post(link, jsdata, configheader);
         })
-        .then((res) => {
-            if (res.data.err_code == 0) {
-                window.location = server + "/clinics_fhir.html";
-            }
-            window.alert(res.data.message);
-        })
+}
+
+function on_org_fhir_management() {
+    //alert('on_org_fhir_management');
+    req_authen_jwt_cookies().then((res) => {
+        if (res.data.err_code == 0) {
+            window.location = server + "/clinics_fhir.html";
+        }
+        window.alert(res.data.message);
+    })
         .catch(console.error);
 }
 function on_patients_fhir_management() {
     alert('on_patients_fhir_management');
     let link = server + "/fhir_org_update";
-    return axios.post(link, {'a':'1'}, configheader);
+    return axios.post(link, { 'a': '1' }, configheader);
 }
 async function on_page_load() {
     if (window.ethereum) {// Modern dapp browsers...
@@ -69,6 +99,7 @@ function connect() {
 function eth_personal_sign(msg) {
     let from = get_selected_addr();
     if (!from) return connect();
+    web3 = get_web3_10();
     return web3.eth.getBlockNumber()
         .then((blockcnt) => {
             let interval = MedcontractInfo.block_interval;
@@ -127,7 +158,7 @@ function getFee() {
     let _fromaddr = web3.currentProvider.selectedAddress;
     return contract.methods.getFee().call({ from: _fromaddr });
 }
-function updateOrgRegisterInfo(org_info, fee_wei,timeoutsec=120) {
+function updateOrgRegisterInfo(org_info, fee_wei, timeoutsec = 120) {
     return new Promise((resolve, reject) => {
         let _fromaddr = web3.currentProvider.selectedAddress;
         let opt = {
@@ -144,11 +175,11 @@ function updateOrgRegisterInfo(org_info, fee_wei,timeoutsec=120) {
                         console.error(err);
                         reject(err);
                     } else {
-                        let evnt={
-                            receipt:abiDecoder.decodeLogs(res.logs),
+                        let evnt = {
+                            receipt: abiDecoder.decodeLogs(res.logs),
                             transactionHash: res.transactionHash,
                             gasUsed: res.cumulativeGasUsed,
-                            blocknum:res.blockNumber
+                            blocknum: res.blockNumber
                         };
                         console.log(evnt);
                         resolve(evnt);
