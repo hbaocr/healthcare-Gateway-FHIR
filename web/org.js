@@ -46,11 +46,13 @@ function on_org_update(){
         document.getElementById('txt_desc').value="";
         return updateOrgRegisterInfo(inf_in,w);
     })
-    .then((receipt)=>{
-        let  txid = receipt.transactionHash;
-        let  ret  = receipt.events.alarmInfo[0].returnValues[2];
-        let  err_code = receipt.events.alarmInfo[1].returnValues[1];
-        let disp= 'TxID   : '+ txid + "\n"+ 
+    .then((evnt)=>{
+        let  txid = evnt.transactionHash;
+        let  ret  = evnt.receipt[0].events[2].value;
+        let  err_code = evnt.receipt[0].events[1].value;
+        let  event_name = evnt.receipt[0].name;
+        let disp=  'Event name :' + event_name +"\n"+
+                   'TxID   : '+ txid + "\n"+ 
                   'Result : '+ ret;
         console.log(disp);
         alert(disp);
