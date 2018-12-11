@@ -1,4 +1,5 @@
 var cors = require('cors');
+var jwt = require('jsonwebtoken');
 var bodyParser = require('body-parser');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -51,6 +52,34 @@ module.exports={
         let pathcontract = __dirname + '/web' + '/contract_config.js';
         console.log('sync up smartcontract setup to web at  : ', pathcontract);
         fs.writeFileSync(pathcontract, ret);
+    },
+    jwt_sign:(payload,pass,expire_sec=1440)=>{
+        var _token = jwt.sign(payload, pass, {
+            expiresIn: expire_sec // expires in 24 hours
+        });
+        return _token;
+    },
+    jwt_verify:(token,pass)=>{
+        return new Promise((resolve,reject)=>{
+            if(token){
+                jwt.verify(token, pass, (err, decoded) => {
+                    if (err) {
+                        resolve(false);
+                        //return res.json({ success: false, message: 'Failed to authenticate token.' });
+                    } else {
+                        // if everything is good, save to request for use in other routes
+                        //req.decoded = decoded;
+                        //next();
+                        resolve(true);
+                    }
+                });
+            }else{
+                resolve(false);
+            }
+        })
+       
+        
     }
+
 
 }

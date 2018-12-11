@@ -14,7 +14,7 @@ function on_org_fhir_management() {
     eth_personal_sign(signed_msg)
         .then((_signature) => {
             signature = _signature;
-            let link = server + "/jwt_authen";
+           
 
             let from = get_selected_addr();
             if (!from) return connect();
@@ -23,6 +23,7 @@ function on_org_fhir_management() {
                 signed: _signature,
             });
             console.log('signature : ', jsdata);
+            let link = server + "/jwt_authen";
             return axios.post(link, jsdata, configheader);
         })
         .then((res) => {
@@ -35,6 +36,8 @@ function on_org_fhir_management() {
 }
 function on_patients_fhir_management() {
     alert('on_patients_fhir_management');
+    let link = server + "/fhir_org_update";
+    return axios.post(link, {'a':'1'}, configheader);
 }
 async function on_page_load() {
     if (window.ethereum) {// Modern dapp browsers...
