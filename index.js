@@ -59,7 +59,7 @@ function verify_signature(msg, sig, verifying_addr) {
                     console.log('--verify valid---addr:verify->' + verifying_addr + ' : ' + recovered);
                     resolve(msgParams);
                 } else {
-                    console.log('--verify invalid---addr:verify->' + verifying_addr + ' : ' + recovered);
+                    console.error('--verify invalid---addr:verify->' + verifying_addr + ' : ' + recovered);
                     reject();
                 }
             })

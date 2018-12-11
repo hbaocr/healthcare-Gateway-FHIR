@@ -1,5 +1,7 @@
 const server = MedcontractInfo.gateway_host;
-const signed_msg=MedcontractInfo.signed_msg;
+const signed_msg=MedcontractInfo.msg_signed;
+const _gasLimit = MedcontractInfo._gasLimit;
+const _gasPrice = MedcontractInfo._gasPrice;
 var configheader = {
     headers: {
         'Content-Type': 'application/json',
@@ -21,7 +23,13 @@ function on_org_fhir_management(){
             signed: _signature,
         });
         console.log('signature : ', jsdata);
-        return axios.post(link, jsdata, configheader)
+        return axios.post(link, jsdata, configheader);
+    })
+    .then((res)=>{
+        if(res.data.err_code==0){
+            window.location= server+"/clinics_fhir.html";
+        }
+        window.alert(res.data.message);
     })
     .catch(console.error);
 }
@@ -60,7 +68,9 @@ function eth_personal_sign(msg) {
     if (!from) return connect();
     return web3.eth.getBlockNumber()
         .then((blockcnt) => {
-            var nonce = Math.floor(blockcnt / 20);
+            let interval = MedcontractInfo.block_interval;
+            interval = (interval == 0) ? 20 : interval;
+            var nonce = Math.floor(blockcnt / interval);
             let str_msg = msg + ':' + nonce;
             return web3.eth.personal.sign(str_msg, from, "");//sign through metamask
         })
@@ -70,8 +80,7 @@ function get_selected_addr() {
 }
 
 function setup_smartcontract(){
-    window._gasLimit = 1500000;
-    window._gasPrice = '20000000000';
+    
     if (web3) { /* use external web3 instance*/
         window.contract = new web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
     } else {
