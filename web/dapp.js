@@ -1,6 +1,5 @@
 const server = MedcontractInfo.gateway_host;
-const fhir_endpoint=MedcontractInfo.fhir_api;
-const signed_msg=MedcontractInfo.msg_signed;
+const signed_msg=MedcontractInfo.signed_msg;
 var configheader = {
     headers: {
         'Content-Type': 'application/json',
@@ -8,75 +7,26 @@ var configheader = {
     }
 };
 var signature;
-//https://metamask.github.io/metamask-docs/Advanced_Concepts/Provider_API#ethereum.on(eventname%2C-callback)
-window.ethereum.on('accountsChanged', function (accounts) {
-    // Time to reload your interface with accounts[0]!
-    console.log('change acc ',accounts);
-  })
-  
-  window.ethereum.on('networkChanged', function (netId) {
-    // Time to reload your interface with netId
-    console.log('change network ',netId);
-  })
-function toHexString(byteArray) {
-    return Array.from(byteArray, function(byte) {
-      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join('')
-  }
-function my_personal_sign(msg) {
-    return new Promise((resolve, reject) => {
-        let from = web3.currentProvider.selectedAddress;
-        //let hex_str = new Buffer(msg, 'utf8').toString('hex');
-        let byteArr=new TextEncoder().encode(msg, 'utf8');
-        let web3_hex_msg = "0x" + toHexString(byteArr);
-        console.log('CLICKED, SENDING PERSONAL SIGN REQ');
-        var params = [web3_hex_msg, from]
-        var method = 'personal_sign'
-        web3.currentProvider.sendAsync({
-            method,
-            params,
-            from,
-        }, (err, result) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            if (result.error) {
-                reject(result.error);
-                return;
-            }
-            resolve(result.result);
-        });
-    })
-}
-
-function do_authentication(){
-   //alert('on_org_fhir_management');
-   return my_eth_metamask_personal_sign(signed_msg)
-   .then((_signature)=>{
-       signature =_signature;
-       let link  = server+"/jwt_authen";
-
-       let from = get_selected_addr();
-       if (!from) return connect();
-       let jsdata = JSON.stringify({
-           account: from,
-           signed: _signature,
-       });
-       console.log('signature : ', jsdata);
-       return axios.post(link, jsdata, configheader)
-   });
-}
-
 function on_org_fhir_management(){
-    do_authentication().then((params)=>{
-        alert(params.data.message);
-        window.location=server+"/"+'clinics_fhir.html'; // redirect to new page with cookies also
+    //alert('on_org_fhir_management');
+    eth_personal_sign(signed_msg)
+    .then((_signature)=>{
+        signature =_signature;
+        let link  = server+"/jwt_authen";
+
+        let from = get_selected_addr();
+        if (!from) return connect();
+        let jsdata = JSON.stringify({
+            account: from,
+            signed: _signature,
+        });
+        console.log('signature : ', jsdata);
+        return axios.post(link, jsdata, configheader)
     })
     .catch(console.error);
 }
 function on_patients_fhir_management(){
-   // alert('on_patients_fhir_management');   
+    alert('on_patients_fhir_management');
 }
 async function on_page_load(){
     if (window.ethereum) {// Modern dapp browsers...
@@ -105,41 +55,12 @@ function connect() {
             .catch(console.error)
     }
 }
-
-//for web3@0.20
-function getBlockCount(){
-    return new Promise((resolve,reject)=>{
-        web3.eth.getBlockNumber((err, cnt) => { 
-            if(err){
-                reject(err)
-            }else{
-                resolve(cnt);
-            }
-         });
-    });
-}
-function my_eth_metamask_personal_sign(msg){
-    let from = get_selected_addr();
-    if (!from) return connect();
-    return getBlockCount()
-    .then((blockcnt) => {
-        let interval= MedcontractInfo.block_interval;
-        interval=(interval==0)?20:interval;
-        var nonce = Math.floor(blockcnt / interval);
-        let str_msg = msg + ':' + nonce;
-        return my_personal_sign(str_msg);//sign through metamask
-    })
-}
-
-//for web3_1.0 only
 function eth_personal_sign(msg) {
     let from = get_selected_addr();
     if (!from) return connect();
     return web3.eth.getBlockNumber()
         .then((blockcnt) => {
-            let interval= MedcontractInfo.block_interval;
-            interval=(interval==0)?20:interval;
-            var nonce = Math.floor(blockcnt / interval);
+            var nonce = Math.floor(blockcnt / 20);
             let str_msg = msg + ':' + nonce;
             return web3.eth.personal.sign(str_msg, from, "");//sign through metamask
         })
@@ -149,31 +70,20 @@ function get_selected_addr() {
 }
 
 function setup_smartcontract(){
-    window._gasLimit = MedcontractInfo._gasLimit;
-    window._gasPrice = MedcontractInfo._gasPrice;
-    // if (web3) { /* use external web3 instance*/
-    //     window.contract = new web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
-    // } else {
-    //     window.contract = new this.web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
-    // }
-    window.contract=web3.eth.contract(MedcontractInfo.abi).at( MedcontractInfo.address)
+    window._gasLimit = 1500000;
+    window._gasPrice = '20000000000';
+    if (web3) { /* use external web3 instance*/
+        window.contract = new web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
+    } else {
+        window.contract = new this.web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
+    }
     return window.contract;
 }
 
 //================Smartcontract Handle========================
 function getFee(){
-    return new Promise((resolve,reject)=>{
-        let _fromaddr = web3.currentProvider.selectedAddress;
-        contract.getFee({ from: _fromaddr },function(err, result){
-            if (!err){
-                resolve(result);
-            }else{
-                reject(err);
-            }
-        })
-    })
-    //let _fromaddr = web3.currentProvider.selectedAddress;
-   // return contract.methods.getFee().call({ from: _fromaddr });
+    let _fromaddr = web3.currentProvider.selectedAddress;
+    return contract.methods.getFee().call({ from: _fromaddr });
 }
 function updateOrgRegisterInfo(org_info,fee_wei){
     let _fromaddr = web3.currentProvider.selectedAddress;
@@ -186,16 +96,6 @@ function updateOrgRegisterInfo(org_info,fee_wei){
     return contract.methods.updateOrgRegisterInfo(org_info).send(opt);
 }
 function getOrgName(_orgId){
-   // let _fromaddr = web3.currentProvider.selectedAddress;
-   // return contract.methods.getOrgName(_orgId).call({ from: _fromaddr });
-   return new Promise((resolve,reject)=>{
     let _fromaddr = web3.currentProvider.selectedAddress;
-    contract.getOrgName(_orgId,{ from: _fromaddr },function(err, result){
-        if (!err){
-            resolve(result);
-        }else{
-            reject(err);
-        }
-    })
-})
+    return contract.methods.getOrgName(_orgId).call({ from: _fromaddr });
 }

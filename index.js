@@ -1,4 +1,3 @@
-
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var bodyParser = require('body-parser');
@@ -17,16 +16,6 @@ var app_port = 8000;
 var app_bind_ip = "0.0.0.0";
 var web3 = Dapp.setup_web3_websocket();
 
-var FhirApi = require("./FhirApi");
-var fhirhost = "http://127.0.0.1:3000/3_0_1/";
-var fhir = new FhirApi(fhirhost);
-// fhir.search_data_fhir(fhir.FHIRservice.ImagingStudy,searchparas).then((res)=>{
-//     console.log(res.data)
-// });
-
-
-
-
 // at first sync up with web the contract Info
 function generate_contract_info_to_webjs() {
 
@@ -36,74 +25,15 @@ function generate_contract_info_to_webjs() {
     fs.writeFileSync(pathcontract, ret);
 }
 generate_contract_info_to_webjs();
-
-const ProtectedRoutes = express.Router();
-
-//my middle ware to check  jwt token on cookies
-
-function checkJwtToken(req, res, next){
-    var token = req.headers['access-token'];
-    // decode token
-    if (token) {
-        // verifies secret and checks exp
-        let pass = app.get('PassJwt')
-        jwt.verify(token, pass, (err, decoded) => {
-            if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
-            } else {
-                // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
-            }
-        });
-
-    } else {
-        return res.status(403).send({  // forbiden
-            message: 'No token provided.'
-        });
-    }
-}
-
-
+app.use("/", express.static(__dirname + '/web'));//mount root of web to 'web'
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 //Set the env PassJwt value
 app.set('PassJwt', config.secret);
-
-
 app.use(bodyParser.json());
 app.use(cookieParser());
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
-
-app.use("/", express.static(__dirname + '/web'));//mount root of web to 'web'
-app.use('/fhir', ProtectedRoutes);
-ProtectedRoutes.use((req, res, next) => {
-    // check header or url parameters or post parameters for token
-    var token = req.headers['access-token'];
-    // decode token
-    if (token) {
-        // verifies secret and checks exp
-        let pass = app.get('PassJwt')
-        jwt.verify(token, pass, (err, decoded) => {
-            if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
-            } else {
-                // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
-            }
-        });
-
-    } else {
-        return res.status(403).send({  // forbiden
-            message: 'No token provided.'
-        });
-    }
-});
-//['/clinics_fhir.html','/submit_credential']
 
 setInterval(async () => {
 
@@ -137,7 +67,6 @@ function verify_signature(msg, sig, verifying_addr) {
 
 }
 
-
 app.post('/jwt_authen', function (req, res) {
     let msg_signed = MedcontractInfo.msg_signed;
     let sig = req.body.signed;
@@ -165,53 +94,6 @@ app.post('/jwt_authen', function (req, res) {
         res.json({ message: "Error! please check your signature !", err_code: 1 })
     })
 });
-
-//for org uppdate their info
-app.post('/org_register_update',function(reg,res){
-
-});
-
-
 app.listen(app_port, app_bind_ip, function () {
     console.log('Example app listening on ' + app_bind_ip + ':' + app_port);
 });
-
-
-
-
-// function eth_personal_sign(hex_str) {
-//     let from = get_selected_addr();
-//     if (!from) return connect();
-//     return web3.eth.getBlockNumber()
-//         .then((blockcnt) => {
-//             var nonce = Math.floor(blockcnt / 10);
-//             hex_str = hex_str + ':' + nonce;
-//             return web3.eth.personal.sign(hex_str, from, "");
-//         })
-// }
-// function eth_personal_recover_addr_from_signature(hex_str,sig){
-//     return web3.eth.getBlockNumber()
-//         .then((blockcnt) => {
-//             var nonce = Math.floor(blockcnt / 10);
-//             hex_str = hex_str + ':' + nonce;
-//             //return web3.eth.personal.sign(hex_str, from, "");
-//             return web3.eth.personal.ecRecover(hex_str,sig);
-//         })
-// }
-// var Dapp = require("./DAppHandler");
-// var web3=Dapp.setup_web3_websocket();
-// var contract=Dapp.setup_smartcontract();
-// Dapp.getFee().then(console.log);
-// Dapp.setFee(100).then(console.log);
-// // Dapp.isOrgAvailable("0x88AB183F9722D0Cd9117079Ef65Da7F7e8C72229").then(console.log);
-// // Dapp.isOrgAvailable("0x699Dc2B03d84bF12EAa57898F653B4A32AdB9a6D").then(console.log);
-// // Dapp.getOrgName("0x88AB183F9722D0Cd9117079Ef65Da7F7e8C72229").then(console.log);
-// // Dapp.getAllOrgs().then(console.log);
-// //Dapp.subscribe_once_alarmInfo_event({_fromsender: '0x88AB183F9722D0Cd9117079Ef65Da7F7e8C72229'});
-// //Dapp.subscribe_to_all_event_of_contract({_fromsender: '0x88AB183F9722D0Cd9117079Ef65Da7F7e8C72229'});
-// //Dapp.updateOrgRegisterInfo("ClinicABC");
-// //Dapp.updatePatientsRegisterInfo("patSS");
-// //Dapp.isPatAvailable("0x88AB183F9722D0Cd9117079Ef65Da7F7e8C72229").then(console.log);
-// Dapp.patientGetDesc().then((data)=>{
-//     console.log(data)}
-// );
