@@ -11,7 +11,7 @@ setInterval(async () => {
 
     let cnt = await web3.eth.getBlockNumber();
     console.log('block cnt :', cnt);
-}, 5000);
+}, 10000);
 function verify_signature(msg, sig, verifying_addr) {
     return new Promise(function (resolve, reject) {
         web3.eth.getBlockNumber()
