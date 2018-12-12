@@ -15,14 +15,14 @@ window.ethereum.on('accountsChanged', (accounts) => {
     //     display_info();
 
     //     setTimeout(() => {
-      
+
     //         req_authen_jwt_cookies().then((res) => {
     //             window.alert(res.data.message);
     //         })
     //         .catch(console.error);
     //     }, 2000); // call after 2 sec
     // }
-   
+
 
 })
 
@@ -64,6 +64,7 @@ function display_info() {
 }
 
 function on_org_update() {
+    let _from=get_selected_addr();
     let inf_in = document.getElementById('txt_desc').value;
     if (inf_in == "") {
         alert("Input organization Info before doing update");
@@ -74,20 +75,30 @@ function on_org_update() {
         return updateOrgRegisterInfo(inf_in, w);
     })
         .then((evnt) => {
-
-            let txid = evnt.transactionHash;
-            let ret = evnt.receipt[0].events[2].value;
-            let err_code = evnt.receipt[0].events[1].value;
-            let event_name = evnt.receipt[0].name;
-            if (err_code == 0) { //* update block chain OK */
-
+            let ret = {
+                info:inf_in,/**info update to smart contract */
+                txid: evnt.transactionHash,
+                from: _from,
+                ret_msg: evnt.receipt[0].events[2].value,
+                event_name: evnt.receipt[0].name,
+                err_code: evnt.receipt[0].events[1].value,
             }
 
-            let disp = 'Event name :' + event_name + "\n" +
-                'TxID   : ' + txid + "\n" +
-                'Result : ' + ret;
-            console.log(disp);
-            alert(disp);
+            if (ret.err_code == 0) { //* update block chain OK */
+                let link = MedcontractInfo.gateway_host + '/fhir_org_update';
+                do_http_post(link, ret)
+                    .then((res) => {
+                        console.log(res);
+                    })
+            } else {
+                let disp = 'Event name :' + ret.event_name + "\n" +
+                    'TxID   : ' + ret.txid + "\n" +
+                    'Result : ' + ret.ret_msg;
+                console.log(disp);
+                alert(disp);
+            }
+
+
         })
         .catch(console.error);
 }

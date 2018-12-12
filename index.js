@@ -4,28 +4,61 @@ var sigUtil = require('eth-sig-util');
 var ethUtil = require('ethereumjs-util');
 var mecrec_dapp = require('./med_contract_handler');
 var fs = require('fs');
-var express_app = require('./gateway_app_config');
+var express_app = require('./gateway_app_utils');
 var MedcontractInfo = require("./contractInfo");
+
+mecrec_dapp = new mecrec_dapp();
 var web3 = mecrec_dapp.setup_web3_websocket();
+var contract = mecrec_dapp.setup_smartcontract(web3);
 var FHIR = require('./FhirApi');
 var fhir_config = require('./config/fhir_config');
 var FHIR_REC = require('./FhirRecords');
-
 var fhir_app = new FHIR(fhir_config.server);
 var fhir_record = new FHIR_REC();
 
 
-// let web_url = fhir_config.server;
-// let div_str = "hello 1 234";
-// let rec = fhir_record.create_org_json_info("test1234", "test_name", web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
-// fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization,rec).then((res)=>{
-//     console.log(res);
-// })
-// fhir_app.get_data_fhir(fhir_app.FHIRservice.Organization,"test1234").then((res)=>{
-//     console.log(res);
-// })
 
 
+
+
+
+function validiate_receipt(txid, _from, _to, _exp_blockgap) {
+
+    var promise0 = web3.eth.getBlockNumber();
+    var promise1 = new Promise((resolve, reject) => {
+        mecrec_dapp.wait_for_receipt(web3, txid, 120, (err, ret) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(ret);
+            }
+        })
+    });
+    return Promise.all([promise0, promise1])
+        .then((rets) => {
+            let c_blockcnt = rets[0];
+            let receipt_blockcnt = rets[1].raw.blockNumber;
+            let receipt_from = rets[1].raw.from;
+            let receipt_to = rets[1].raw.to;
+            let err = rets[1].receipt[0].events[1].value;
+            if ((err == 0) && (receipt_from == _from) && (receipt_to == _to) && ((receipt_blockcnt - c_blockcnt) < _exp_blockgap)) {
+                let result = {
+                    isValid: true,
+                    details: rets,
+                }
+                return Promise.resolve(result);
+            } else {
+                let result = {
+                    isValid: false,
+                    details: rets,
+                }
+                return Promise.resolve(result);
+            }
+        })
+        .catch((err) => {
+            return Promise.reject(err);
+        })
+}
 
 setInterval(async () => {
     let cnt = await web3.eth.getBlockNumber();
@@ -84,19 +117,68 @@ app.post('/jwt_authen', function (req, res) {
     })
 });
 
-app.post('/fhir_org_update', async (req, res) => {
-    let cookie = req.cookies;
+app.post('/fhir_org_update', async (req, response) => {
+    //let cookie = req.cookies;
     let fhirtoken = req.cookies.fhirtoken;
     let pass = app.get('PassJwt');
     let is_login = await express_app.jwt_verify(fhirtoken, pass);
     if (is_login) {
-        let web_url = fhir_config.server;
-        let div_str = "hello 1 234";
-        let rec = fhir_record.create_org_json_info("test1234", "test_name", web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
-        fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization,rec).then((res)=>{
-            console.log(res);
+        let txid = req.body.txid;
+        let org_inf = req.body.ret_msg;
+        let from = req.body.from;
+        validiate_receipt(txid, from, MedcontractInfo.address, 20).then((ret) => {
+            if (ret.isValid) {
+                let web_url = fhir_config.server;
+                let desc={
+                    info:'this is test Infomation of Orgs. And can be more details',
+                    desc:org_inf,
+                    contract:MedcontractInfo.address
+                }
+                let div_str = JSON.stringify(desc);
+                let rec = fhir_record.create_org_json_info(from, org_inf, web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
+                fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization, rec).then((ret) => {
+                    //console.log(res);
+                    let r={
+                        isValid: true,
+                        msg:'valid txid',
+                        details: ret,
+                    }
+                    response.json(r);
+                    // if((res.status==200)||(res.status==201)){
+                    //     ret.js
+                    // }else{ //failed
+
+                    // }
+                })
+            } else {
+                let r={
+                    isValid: false,
+                    msg:'invalid txid',
+                    details: ret,
+                }
+                response.json(r);
+            }
+        }).catch((err) => {
+            let r={
+                isValid: false,
+                msg:'request error',
+                details: err,
+            }
+            response.json(r);
+            console.error(err);
         })
-    }else{
+        //    mecrec_dapp.wait_for_receipt(txid,120,(err,res)=>{
+        //        console.log(res);
+        //    })
+        //check txid --> make sure blockchain already change
+
+        // let web_url = fhir_config.server;
+        // let div_str = "hello 1 234";
+        // let rec = fhir_record.create_org_json_info("test1234", "test_name", web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
+        // fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization,rec).then((res)=>{
+        //     console.log(res);
+        // })
+    } else {
         console.error('fhir_org_update-->cookies error');
     }
 

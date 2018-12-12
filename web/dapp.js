@@ -20,7 +20,7 @@ function get_web3_10(){
     return window.web3;
 }
 //post link inclue cookies also
-function do_http_post(js_obj, link, header_opt) {
+function do_http_post(link,js_obj, header_opt) {
     let req_header = {};
     if (header_opt) {
         req_header = {
@@ -144,7 +144,12 @@ function wait_for_receipt(txhash, timeoutsec, cb, periodsec = 5) {
             cb(error, result);
         } else {
             if (res) {
-                cb(null, res);
+                let receipt=abiDecoder.decodeLogs(res.logs);
+                    let ret ={
+                        raw:res,
+                        receipt:receipt,
+                    }
+                cb(null,ret);
             } else {
                 setTimeout(() => {
                     wait_for_receipt(txhash, timeoutsec, cb, periodsec);
@@ -170,11 +175,12 @@ function updateOrgRegisterInfo(org_info, fee_wei, timeoutsec = 120) {
         contract.methods.updateOrgRegisterInfo(org_info).send(opt)
             .on('transactionHash', function (hash) {
                 console.log('tx hash : ', hash);
-                wait_for_receipt(hash, timeoutsec, (err, res) => {
+                wait_for_receipt(hash, timeoutsec, (err, ret) => {
                     if (err) {
                         console.error(err);
                         reject(err);
                     } else {
+                        let res = ret.raw;
                         let evnt = {
                             receipt: abiDecoder.decodeLogs(res.logs),
                             transactionHash: res.transactionHash,
