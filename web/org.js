@@ -3,7 +3,6 @@ window.addEventListener('load', async () => {
     await on_page_load();
     setup_smartcontract();
     display_info();
-
     setInterval(() => {
         display_info();
     }, 5000);
@@ -70,11 +69,20 @@ function on_org_update() {
         alert("Input organization Info before doing update");
         return;
     }
-    getFee().then((w) => {
+
+    let valid_cookies_token_link = MedcontractInfo.gateway_host +'/is_login_legit';
+    do_http_post(valid_cookies_token_link,{}).then((isValid)=>{
+        if(isValid){
+            return getFee();
+        }else{
+            window.alert('Token Expired!Please Do Authentication Again ');
+        }
+      
+    })
+    .then((w) => {
         document.getElementById('txt_desc').value = "";
         return updateOrgRegisterInfo(inf_in, w);
-    })
-        .then((evnt) => {
+    }).then((evnt) => {
             let ret = {
                 info:inf_in,/**info update to smart contract */
                 txid: evnt.transactionHash,
@@ -87,8 +95,13 @@ function on_org_update() {
             if (ret.err_code == 0) { //* update block chain OK */
                 let link = MedcontractInfo.gateway_host + '/fhir_org_update';
                 do_http_post(link, ret)
-                    .then((res) => {
-                        console.log(res);
+                    .then((_res) => {
+                        if(_res.data.isValid){
+                            window.alert('Success to Update Organization');
+                        }else{
+                            window.alert('Update Blockchain Ok but FHIR failed');
+                        }
+                        console.log(_res);
                     })
             } else {
                 let disp = 'Event name :' + ret.event_name + "\n" +
@@ -100,6 +113,9 @@ function on_org_update() {
 
 
         })
-        .catch(console.error);
+        .catch((err)=>{
+            window.alert('Update failed '+err.toString());
+            console.error(err);
+        });
 }
 

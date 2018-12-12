@@ -10,9 +10,31 @@ var configheader = {
 };
 var signature;
 
+function on_org_update_info() {
+    req_authen_jwt_cookies().then((res) => {
+        window.alert(res.data.message);
+    })
+}
+function on_org_fhir_management() {
+    //alert('on_org_fhir_management');
+    req_authen_jwt_cookies().then((res) => {
+        if (res.data.err_code == 0) {
+            window.location = server + "/clinics_fhir.html";
+        }
+        window.alert(res.data.message);
+    })
+        .catch(console.error);
+}
+function on_patients_fhir_management() {
+    alert('on_patients_fhir_management');
+    let link = server + "/fhir_org_update";
+    return axios.post(link, { 'a': '1' }, configheader);
+}
+
+
 //to make sure already overide web3@0.20(built-in by metamask) by web3@1.0
-function get_web3_10(){
-    if(web3.version.api){
+function get_web3_10() {
+    if (web3.version.api) {
         window.web3 = new Web3(ethereum);
         setup_smartcontract();
     }
@@ -20,7 +42,7 @@ function get_web3_10(){
     return window.web3;
 }
 //post link inclue cookies also
-function do_http_post(link,js_obj, header_opt) {
+function do_http_post(link, js_obj, header_opt) {
     let req_header = {};
     if (header_opt) {
         req_header = {
@@ -36,8 +58,6 @@ function do_http_post(link,js_obj, header_opt) {
     }
     return axios.post(link, js_obj, req_header);
 }
-
-
 function req_authen_jwt_cookies() {
     return eth_personal_sign(signed_msg)
         .then((_signature) => {
@@ -52,22 +72,6 @@ function req_authen_jwt_cookies() {
             let link = server + "/jwt_authen";
             return axios.post(link, jsdata, configheader);
         })
-}
-
-function on_org_fhir_management() {
-    //alert('on_org_fhir_management');
-    req_authen_jwt_cookies().then((res) => {
-        if (res.data.err_code == 0) {
-            window.location = server + "/clinics_fhir.html";
-        }
-        window.alert(res.data.message);
-    })
-        .catch(console.error);
-}
-function on_patients_fhir_management() {
-    alert('on_patients_fhir_management');
-    let link = server + "/fhir_org_update";
-    return axios.post(link, { 'a': '1' }, configheader);
 }
 async function on_page_load() {
     if (window.ethereum) {// Modern dapp browsers...
@@ -112,7 +116,6 @@ function eth_personal_sign(msg) {
 function get_selected_addr() {
     return web3.currentProvider.selectedAddress;
 }
-
 function setup_smartcontract() {
 
     if (web3) { /* use external web3 instance*/
@@ -127,8 +130,6 @@ function setup_smartcontract() {
      */
     return window.contract;
 }
-
-
 function wait_for_receipt(txhash, timeoutsec, cb, periodsec = 5) {
     let err = null;
     let result = null;
@@ -144,12 +145,12 @@ function wait_for_receipt(txhash, timeoutsec, cb, periodsec = 5) {
             cb(error, result);
         } else {
             if (res) {
-                let receipt=abiDecoder.decodeLogs(res.logs);
-                    let ret ={
-                        raw:res,
-                        receipt:receipt,
-                    }
-                cb(null,ret);
+                let receipt = abiDecoder.decodeLogs(res.logs);
+                let ret = {
+                    raw: res,
+                    receipt: receipt,
+                }
+                cb(null, ret);
             } else {
                 setTimeout(() => {
                     wait_for_receipt(txhash, timeoutsec, cb, periodsec);

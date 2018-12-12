@@ -17,11 +17,6 @@ var fhir_app = new FHIR(fhir_config.server);
 var fhir_record = new FHIR_REC();
 
 
-
-
-
-
-
 function validiate_receipt(txid, _from, _to, _exp_blockgap) {
 
     var promise0 = web3.eth.getBlockNumber();
@@ -116,7 +111,12 @@ app.post('/jwt_authen', function (req, res) {
         res.json({ message: "Error! please check your signature !", err_code: 1 })
     })
 });
-
+app.post('/is_login_legit',async (req,resp)=>{
+    let fhirtoken = req.cookies.fhirtoken;
+    let pass = app.get('PassJwt');
+    let is_login = await express_app.jwt_verify(fhirtoken, pass);
+    resp.json({isValid:is_login});
+});
 app.post('/fhir_org_update', async (req, response) => {
     //let cookie = req.cookies;
     let fhirtoken = req.cookies.fhirtoken;
@@ -124,11 +124,11 @@ app.post('/fhir_org_update', async (req, response) => {
     let is_login = await express_app.jwt_verify(fhirtoken, pass);
     if (is_login) {
         let txid = req.body.txid;
-        let org_inf = req.body.ret_msg;
+        let org_inf = req.body.info;
         let from = req.body.from;
         validiate_receipt(txid, from, MedcontractInfo.address, 20).then((ret) => {
             if (ret.isValid) {
-                let web_url = fhir_config.server;
+                let web_url = req.path;
                 let desc={
                     info:'this is test Infomation of Orgs. And can be more details',
                     desc:org_inf,
@@ -137,18 +137,13 @@ app.post('/fhir_org_update', async (req, response) => {
                 let div_str = JSON.stringify(desc);
                 let rec = fhir_record.create_org_json_info(from, org_inf, web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
                 fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization, rec).then((ret) => {
-                    //console.log(res);
+                    console.log('Update org OK');
                     let r={
                         isValid: true,
                         msg:'valid txid',
                         details: ret,
                     }
                     response.json(r);
-                    // if((res.status==200)||(res.status==201)){
-                    //     ret.js
-                    // }else{ //failed
-
-                    // }
                 })
             } else {
                 let r={
@@ -156,9 +151,12 @@ app.post('/fhir_org_update', async (req, response) => {
                     msg:'invalid txid',
                     details: ret,
                 }
+                console.log('Invalid Txid');
+
                 response.json(r);
             }
-        }).catch((err) => {
+        })
+        .catch((err) => {
             let r={
                 isValid: false,
                 msg:'request error',
@@ -167,22 +165,18 @@ app.post('/fhir_org_update', async (req, response) => {
             response.json(r);
             console.error(err);
         })
-        //    mecrec_dapp.wait_for_receipt(txid,120,(err,res)=>{
-        //        console.log(res);
-        //    })
-        //check txid --> make sure blockchain already change
-
-        // let web_url = fhir_config.server;
-        // let div_str = "hello 1 234";
-        // let rec = fhir_record.create_org_json_info("test1234", "test_name", web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
-        // fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization,rec).then((res)=>{
-        //     console.log(res);
-        // })
     } else {
+        let r={
+            isValid: false,
+            msg:'Expired Time--> Try to Authen Again',
+            details: '',
+        }
         console.error('fhir_org_update-->cookies error');
     }
 
 })
+app.post('/fhir_org_insert_patient',async (req, response)=>{
 
+})
 
 
