@@ -75,15 +75,7 @@ function on_org_update_click() {
 
             if (ret.err_code == 0) { //* update block chain OK */
                 let link = MedcontractInfo.gateway_host + '/fhir_org_update';
-                do_http_post(link, ret)
-                    .then((_res) => {
-                        if(_res.data.isValid){
-                            window.alert('Success to Update Organization');
-                        }else{
-                            window.alert('Update Blockchain Ok but FHIR failed');
-                        }
-                        console.log(_res);
-                    })
+                return do_http_post(link, ret);
             } else {
                 let disp = 'Event name :' + ret.event_name + "\n" +
                     'TxID   : ' + ret.txid + "\n" +
@@ -91,8 +83,14 @@ function on_org_update_click() {
                 console.log(disp);
                 alert(disp);
             }
-
-
+        })
+        .then((_res) => { //do_http_post handle
+            if(_res.data.isValid){
+                window.alert('Success to Update Organization');
+            }else{
+                window.alert('Update Blockchain Ok but FHIR failed');
+            }
+            console.log(_res);
         })
         .catch((err)=>{
             window.alert('Update failed '+err.toString());

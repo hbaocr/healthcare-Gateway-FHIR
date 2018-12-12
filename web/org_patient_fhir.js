@@ -71,21 +71,51 @@ function on_submit_patient_report_click(){
         if(isValid){
             return getFee();
         }else{
-            window.alert('Token Expired!Please Do Authentication Again ');
+            window.alert('Login Token Expired!Please Do Authentication Again ');
+            return;
         }
     })
     .then((w) => {
         return orgUpdatePatientDocument(_patId,_did,_desc,w,120);
     })
     .then((evnt) => {
-        let _ret = {
-            info:inf_in,/**info update to smart contract */
+        let ret = {
+            info:_report,/**info update to smart contract */
+            did:_did,
+            patID:_patId,
+            descript:_desc,
             txid: evnt.transactionHash,
             from: _from,
             ret_msg: evnt.receipt[0].events[2].value,
             event_name: evnt.receipt[0].name,
             err_code: evnt.receipt[0].events[1].value,
         }
-        console.log(_ret);
+
+        if (ret.err_code == 0) { //* update block chain OK */
+            let link = MedcontractInfo.gateway_host + '/fhir_org_insert_patient';
+            return do_http_post(link, ret);
+        }else{
+            let disp = 'Event name :' + ret.event_name + "\n" +
+            'TxID   : ' + ret.txid + "\n" +
+            'DID    : ' + ret.did + "\n" +
+            'Result : ' + ret.ret_msg;
+            console.log(disp);
+            alert(disp);
+        }
+    })
+    .then((_res)=>{
+        if(_res.data.isValid){
+            let disp='Success to Insert new documents to patient'+"\n"+
+            'document_id : '+_did;
+            console.log(disp);
+            window.alert(disp);
+        }else{
+            window.alert('Update Blockchain Ok but FHIR failed');
+        }
+        console.log(_res);
+    })
+    .catch((err)=>{
+        window.alert('Update failed '+err.toString());
+        console.error(err);
     })
 }

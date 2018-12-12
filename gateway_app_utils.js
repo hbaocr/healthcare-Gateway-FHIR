@@ -10,18 +10,18 @@ var fs = require('fs');
 var MedcontractInfo = require("./contractInfo");
 
 
-module.exports={
-    setup:(app_ex)=>{
-       
+module.exports = {
+    setup: (app_ex) => {
+
         let app;
 
-        if(app_ex){
-             app =app_ex;
-         }else{
-             app = express();
-         }
+        if (app_ex) {
+            app = app_ex;
+        } else {
+            app = express();
+        }
         app.use("/", express.static(__dirname + '/web'));//mount root of web to 'web'
-        
+
         let ret = "MedcontractInfo = " + JSON.stringify(MedcontractInfo);
         let pathcontract = __dirname + '/web' + '/contract_config.js';
         console.log('sync up smartcontract setup to web app at  : ', pathcontract);
@@ -37,49 +37,45 @@ module.exports={
         app.use(bodyParser.urlencoded({ extended: true }));
         return app;
     },
-    begin:(app,app_bind_ip,app_port)=>{
-        if(app){
+    begin: (app, app_bind_ip, app_port) => {
+        if (app) {
             this.app_port = app_port;
             this.app_bind_ip = app_bind_ip;
             app.listen(app_port, app_bind_ip, function () {
                 console.log('Example app listening on ' + app_bind_ip + ':' + app_port);
             });
-        }else{
+        } else {
             console.log('No express app ' + app_bind_ip + ':' + app_port);
         }
     },
-    generate_contract_info_to_webjs:()=>{
+    generate_contract_info_to_webjs: () => {
         let ret = "MedcontractInfo = " + JSON.stringify(MedcontractInfo);
         let pathcontract = __dirname + '/web' + '/contract_config.js';
         console.log('sync up smartcontract setup to web at  : ', pathcontract);
         fs.writeFileSync(pathcontract, ret);
     },
-    jwt_sign:(payload,pass,expire_sec=1440)=>{
+    jwt_sign: (payload, pass, expire_sec = 1440) => {
         var _token = jwt.sign(payload, pass, {
             expiresIn: expire_sec // expires in 24 hours
         });
         return _token;
     },
-    jwt_verify:(token,pass)=>{
-        return new Promise((resolve,reject)=>{
-            if(token){
+    jwt_verify: (token, pass) => {
+        return new Promise((resolve, reject) => {
+            if (token) {
                 jwt.verify(token, pass, (err, decoded) => {
                     if (err) {
                         resolve(false);
-                        //return res.json({ success: false, message: 'Failed to authenticate token.' });
                     } else {
-                        // if everything is good, save to request for use in other routes
-                        //req.decoded = decoded;
-                        //next();
                         resolve(true);
                     }
                 });
-            }else{
+            } else {
                 resolve(false);
             }
         })
-       
-        
+
+
     }
 
 

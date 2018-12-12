@@ -111,11 +111,11 @@ app.post('/jwt_authen', function (req, res) {
         res.json({ message: "Error! please check your signature !", err_code: 1 })
     })
 });
-app.post('/is_login_legit',async (req,resp)=>{
+app.post('/is_login_legit', async (req, resp) => {
     let fhirtoken = req.cookies.fhirtoken;
     let pass = app.get('PassJwt');
     let is_login = await express_app.jwt_verify(fhirtoken, pass);
-    resp.json({isValid:is_login});
+    resp.json({ isValid: is_login });
 });
 app.post('/fhir_org_update', async (req, response) => {
     //let cookie = req.cookies;
@@ -129,26 +129,31 @@ app.post('/fhir_org_update', async (req, response) => {
         validiate_receipt(txid, from, MedcontractInfo.address, 20).then((ret) => {
             if (ret.isValid) {
                 let web_url = req.path;
-                let desc={
-                    info:'this is test Infomation of Orgs. And can be more details',
-                    desc:org_inf,
-                    contract:MedcontractInfo.address
+                let desc = {
+                    info: 'this is test Infomation of Orgs. And can be more details',
+                    desc: org_inf,
+                    contract: MedcontractInfo.address
                 }
                 let div_str = JSON.stringify(desc);
                 let rec = fhir_record.create_org_json_info(from, org_inf, web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
                 fhir_app.update_data_fhir(fhir_app.FHIRservice.Organization, rec).then((ret) => {
-                    console.log('Update org OK');
-                    let r={
+                    console.log('Update ORG .....');
+                    let r = {
                         isValid: true,
-                        msg:'valid txid',
+                        msg: 'valid txid',
                         details: ret,
+                    }
+                    if ((ret.status == 200) || (ret.status == 201)) {
+                        r.isValid = true;
+                    } else {
+                        r.isValid = false;
                     }
                     response.json(r);
                 })
             } else {
-                let r={
+                let r = {
                     isValid: false,
-                    msg:'invalid txid',
+                    msg: 'invalid txid',
                     details: ret,
                 }
                 console.log('Invalid Txid');
@@ -156,27 +161,91 @@ app.post('/fhir_org_update', async (req, response) => {
                 response.json(r);
             }
         })
-        .catch((err) => {
-            let r={
-                isValid: false,
-                msg:'request error',
-                details: err,
-            }
-            response.json(r);
-            console.error(err);
-        })
+            .catch((err) => {
+                let r = {
+                    isValid: false,
+                    msg: 'request error',
+                    details: err,
+                }
+                response.json(r);
+                console.error(err);
+            })
     } else {
-        let r={
+        let r = {
             isValid: false,
-            msg:'Expired Time--> Try to Authen Again',
+            msg: 'Expired Time--> Try to Authen Again',
             details: '',
         }
+        response.json(r);
         console.error('fhir_org_update-->cookies error');
     }
 
 })
-app.post('/fhir_org_insert_patient',async (req, response)=>{
+app.post('/fhir_org_insert_patient', async (req, response) => {
+    //let cookie = req.cookies;
+    let fhirtoken = req.cookies.fhirtoken;
+    let pass = app.get('PassJwt');
+    let is_login = await express_app.jwt_verify(fhirtoken, pass);
+    if (is_login) {
+        let txid = req.body.txid;
+        let _report = req.body.info;
+        let from = req.body.from;
+        let _did = req.body.did;
+        let _patid = req.body.patID;
+        validiate_receipt(txid, from, MedcontractInfo.address, 20).then((ret) => {
+            if (ret.isValid) {
+                let web_url = req.path;
+                let desc = {
+                    info: 'this is test Report of Patient. And can be more details',
+                    report: _report,
+                    contract: MedcontractInfo.address
+                }
 
+                let div_str = JSON.stringify(desc);
+                let rec = fhir_record.create_imageStudy_json_info(_did, _patid, from, div_str);
+                fhir_app.update_data_fhir(fhir_app.FHIRservice.ImagingStudy, rec).then((ret) => {
+                    console.log('Update Images..... ' + _did);
+                    let r = {
+                        isValid: true,
+                        msg: 'valid txid',
+                        details: ret,
+                    }
+                    if ((ret.status == 200) || (ret.status == 201)) {
+                        r.isValid = true;
+                    } else {
+                        r.isValid = false;
+                    }
+                    response.json(r);
+                })
+            } else {
+                let r = {
+                    isValid: false,
+                    msg: 'invalid txid',
+                    details: ret,
+                }
+                console.log('Invalid Txid');
+
+                response.json(r);
+            }
+        })
+            .catch((err) => {
+                let r = {
+                    isValid: false,
+                    msg: 'request error',
+                    details: err,
+                }
+                response.json(r);
+                console.error(err);
+            })
+    } else {
+        let r = {
+            isValid: false,
+            msg: 'Expired Time--> Try to Authen Again',
+            details: '',
+        }
+        response.json(r);
+        console.error('fhir_org_update-->cookies error');
+    }
 })
 
 
