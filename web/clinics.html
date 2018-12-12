@@ -16,7 +16,7 @@
     <script src="/contract_config.js"></script>
     <script src="/dapp.js"></script>
     <script src="/org.js"></script>
-
+    <script src="/org_general.js"></script>
 </head>
 
 <body>
@@ -39,7 +39,7 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li class="active"><a href="clinics.html">General/Resgister/Update</a></li>
-                    <li><a onclick="on_org_fhir_management()" href='#'>Manage FHIR Records</a></li>
+                    <li><a onclick="on_org_fhir_management_menu()" href='#'>Manage FHIR Records</a></li>
                 </ul>
             </li>
 
@@ -48,7 +48,7 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="patients.html">General/Resgister/Update</a></li>
-                    <li><a onclick="on_patients_fhir_management()" href="#">Manage FHIR Records</a></li>
+                    <li><a onclick="on_patients_fhir_management_menu()" href="#">Manage FHIR Records</a></li>
                 </ul>
             </li>
         </ul>
@@ -91,7 +91,7 @@
                     <label for="txt_desc">Description:</label>
                     <input type="text" class="form-control" id="txt_desc">
                 </div>
-                <button type="button" class="btn btn-primary btn-block" onclick="on_org_update()">Update Organization
+                <button type="button" class="btn btn-primary btn-block" onclick="on_org_update_click()">Update Organization
                     Description</button>
 
             </div>

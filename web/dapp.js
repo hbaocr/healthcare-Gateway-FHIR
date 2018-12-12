@@ -9,13 +9,45 @@ var configheader = {
     }
 };
 var signature;
-
-function on_org_update_info() {
-    req_authen_jwt_cookies().then((res) => {
-        window.alert(res.data.message);
-    })
+//two first running function to init app
+async function on_page_load() {
+    if (window.ethereum) {// Modern dapp browsers...
+        window.web3 = new Web3(ethereum);
+        try {
+            await ethereum.enable();  //  // Request account access if needed.Acccounts now exposed     
+        } catch (error) {
+            console.log(error);
+        }
+    } else if (window.web3) {//  Legacy dapp browsers...
+        window.web3 = new Web3(web3.currentProvider);
+    } else {  // Non-dapp browsers...
+        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    }
 }
-function on_org_fhir_management() {
+function setup_smartcontract() {
+
+    if (web3) { /* use external web3 instance*/
+        window.contract = new web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
+    } else {
+        window.contract = new this.web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
+    }
+    abiDecoder.addABI(MedcontractInfo.abi);// lib for decode transaction receipt.logs
+    /**
+     *  abidecoder.addABI(abi)
+        abidecoder.decodeLogs(txReceipt.logs)
+     */
+    return window.contract;
+}
+
+
+
+// function on_org_update_info() {
+//     req_authen_jwt_cookies().then((res) => {
+//         window.alert(res.data.message);
+//     })
+// }
+
+function on_org_fhir_management_menu() {
     //alert('on_org_fhir_management');
     req_authen_jwt_cookies().then((res) => {
         if (res.data.err_code == 0) {
@@ -25,12 +57,11 @@ function on_org_fhir_management() {
     })
         .catch(console.error);
 }
-function on_patients_fhir_management() {
+function on_patients_fhir_management_menu() {
     alert('on_patients_fhir_management');
     let link = server + "/fhir_org_update";
     return axios.post(link, { 'a': '1' }, configheader);
 }
-
 
 //to make sure already overide web3@0.20(built-in by metamask) by web3@1.0
 function get_web3_10() {
@@ -73,20 +104,7 @@ function req_authen_jwt_cookies() {
             return axios.post(link, jsdata, configheader);
         })
 }
-async function on_page_load() {
-    if (window.ethereum) {// Modern dapp browsers...
-        window.web3 = new Web3(ethereum);
-        try {
-            await ethereum.enable();  //  // Request account access if needed.Acccounts now exposed     
-        } catch (error) {
-            console.log(error);
-        }
-    } else if (window.web3) {//  Legacy dapp browsers...
-        window.web3 = new Web3(web3.currentProvider);
-    } else {  // Non-dapp browsers...
-        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-    }
-}
+
 
 function setHTMLTag(tagId, info_str) {
     document.getElementById(tagId).innerHTML = info_str;
@@ -116,20 +134,7 @@ function eth_personal_sign(msg) {
 function get_selected_addr() {
     return web3.currentProvider.selectedAddress;
 }
-function setup_smartcontract() {
 
-    if (web3) { /* use external web3 instance*/
-        window.contract = new web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
-    } else {
-        window.contract = new this.web3.eth.Contract(MedcontractInfo.abi, MedcontractInfo.address);
-    }
-    abiDecoder.addABI(MedcontractInfo.abi);// lib for decode transaction receipt.logs
-    /**
-     *  abidecoder.addABI(abi)
-        abidecoder.decodeLogs(txReceipt.logs)
-     */
-    return window.contract;
-}
 function wait_for_receipt(txhash, timeoutsec, cb, periodsec = 5) {
     let err = null;
     let result = null;
@@ -199,3 +204,37 @@ function getOrgName(_orgId) {
     let _fromaddr = web3.currentProvider.selectedAddress;
     return contract.methods.getOrgName(_orgId).call({ from: _fromaddr });
 }
+
+function orgUpdatePatientDocument(_patID,_did,_desc,fee_wei,timeoutsec=120){
+    return new Promise((resolve, reject) => {
+        let _fromaddr = web3.currentProvider.selectedAddress;
+        let opt = {
+            from: _fromaddr,
+            gas: _gasLimit,//gas limitted
+            gasPrice: _gasPrice, // default gas price in wei, 20 gwei in this case
+            value: fee_wei,//this.web3.utils.toBN(0)//no need transfer with value of ETH
+        }
+        contract.methods.orgUpdatePatientDocument(_patID,_did,_desc).send(opt)
+            .on('transactionHash', function (hash) {
+                console.log('tx hash : ', hash);
+                wait_for_receipt(hash, timeoutsec, (err, ret) => {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    } else {
+                        let res = ret.raw;
+                        let evnt = {
+                            receipt: abiDecoder.decodeLogs(res.logs),
+                            transactionHash: res.transactionHash,
+                            gasUsed: res.cumulativeGasUsed,
+                            blocknum: res.blockNumber
+                        };
+                        console.log(evnt);
+                        resolve(evnt);
+                    }
+                });
+            })
+    });
+
+}
+
