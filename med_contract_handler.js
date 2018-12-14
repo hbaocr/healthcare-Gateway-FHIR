@@ -69,11 +69,11 @@ class DappHandler
         })
     }
 
-    getFee(){
+    get_fee(){
         let _fromaddr = this.web3.eth.accounts.wallet[0].address;
         return this.contract.methods.getFee().call({ from: _fromaddr });
     }
-    setFee(fee_wei){
+    set_fee(fee_wei){
         //let wei = this.web3.utils.toWei(howmuch_eth.toString(), 'ether');
         let _fromaddr = this.web3.eth.accounts.wallet[0].address;
         //let _fromaddr = "0x88AB183F9722D0Cd9117079Ef65Da7F7e8C72229".toLowerCase();//
@@ -84,6 +84,13 @@ class DappHandler
             value: this.web3.utils.toBN(0)//no need transfer with value of ETH
         }
         return this.contract.methods.setFee(fee_wei).send(opt);
+    }
+    //create _did from msg
+    create_did(sender,msg){
+        let web3=this.web3;
+        let _tmp=web3.utils.sha3(msg+''+sender) ;
+        let _tmp_acc=web3.eth.accounts.privateKeyToAccount(_tmp);
+        return _tmp_acc.address.toLowerCase();
     }
 
 

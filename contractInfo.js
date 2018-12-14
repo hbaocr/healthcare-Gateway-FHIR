@@ -6,21 +6,12 @@ module.exports = {
     block_interval: 100, // for signing change each interval of block ( 100 block signature change) 
     _gasLimit: 1500000,
     _gasPrice: '20000000000',
-    address: "0x36b0ae17122915c8c811e685dda64afd0010280f",
+    address: "0x85ba770ad387a5b094fcb3abbc96448bc3550141",
     abi:[
         {
             "constant": false,
-            "inputs": [
-                {
-                    "name": "_to",
-                    "type": "address"
-                },
-                {
-                    "name": "_name",
-                    "type": "string"
-                }
-            ],
-            "name": "changeOwnerService",
+            "inputs": [],
+            "name": "org_get_all_pat",
             "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
@@ -30,19 +21,11 @@ module.exports = {
             "constant": false,
             "inputs": [
                 {
-                    "name": "_patID",
-                    "type": "address"
-                },
-                {
-                    "name": "_did",
-                    "type": "uint256"
-                },
-                {
-                    "name": "_description",
+                    "name": "_name",
                     "type": "string"
                 }
             ],
-            "name": "orgUpdatePatientDocument",
+            "name": "org_insert_info",
             "outputs": [],
             "payable": true,
             "stateMutability": "payable",
@@ -52,22 +35,94 @@ module.exports = {
             "constant": false,
             "inputs": [
                 {
-                    "name": "_orgId",
+                    "name": "_pID",
                     "type": "address"
                 },
                 {
-                    "name": "_permission",
-                    "type": "uint256"
+                    "name": "_dID",
+                    "type": "address"
                 },
                 {
-                    "name": "expired_utc_time",
-                    "type": "uint256"
+                    "name": "_description",
+                    "type": "string"
                 }
             ],
-            "name": "patientApproveOrgsPermission",
+            "name": "org_insert_pat_did",
+            "outputs": [],
+            "payable": true,
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "_oID",
+                    "type": "address"
+                },
+                {
+                    "name": "_pID",
+                    "type": "address"
+                }
+            ],
+            "name": "org_read_pat_did",
             "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "_oID",
+                    "type": "address"
+                },
+                {
+                    "name": "_permsion",
+                    "type": "uint256"
+                },
+                {
+                    "name": "_expiredTime",
+                    "type": "uint256"
+                }
+            ],
+            "name": "pat_allow_org",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [],
+            "name": "pat_get_all_did",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [],
+            "name": "pat_get_all_org",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "_name",
+                    "type": "string"
+                }
+            ],
+            "name": "pat_insert_info",
+            "outputs": [],
+            "payable": true,
+            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -78,38 +133,10 @@ module.exports = {
                     "type": "uint256"
                 }
             ],
-            "name": "setFee",
+            "name": "set_fee",
             "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "constant": false,
-            "inputs": [
-                {
-                    "name": "_orgName",
-                    "type": "string"
-                }
-            ],
-            "name": "updateOrgRegisterInfo",
-            "outputs": [],
-            "payable": true,
-            "stateMutability": "payable",
-            "type": "function"
-        },
-        {
-            "constant": false,
-            "inputs": [
-                {
-                    "name": "_description",
-                    "type": "string"
-                }
-            ],
-            "name": "updatePatientsRegisterInfo",
-            "outputs": [],
-            "payable": true,
-            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -122,8 +149,8 @@ module.exports = {
             ],
             "name": "withdraw",
             "outputs": [],
-            "payable": false,
-            "stateMutability": "nonpayable",
+            "payable": true,
+            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -163,9 +190,14 @@ module.exports = {
                     "indexed": true,
                     "name": "_to",
                     "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "name": "ripemd160_hash",
+                    "type": "address"
                 }
             ],
-            "name": "alarmInfo",
+            "name": "log_alarm_info",
             "type": "event"
         },
         {
@@ -177,16 +209,6 @@ module.exports = {
                     "type": "address"
                 },
                 {
-                    "indexed": true,
-                    "name": "_target",
-                    "type": "address"
-                },
-                {
-                    "indexed": false,
-                    "name": "addrs",
-                    "type": "address[]"
-                },
-                {
                     "indexed": false,
                     "name": "errcode",
                     "type": "uint256"
@@ -195,98 +217,25 @@ module.exports = {
                     "indexed": false,
                     "name": "info",
                     "type": "string"
-                }
-            ],
-            "name": "logReturnAddr",
-            "type": "event"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": true,
-                    "name": "_fromsender",
-                    "type": "address"
                 },
                 {
                     "indexed": true,
-                    "name": "_target",
+                    "name": "_to",
                     "type": "address"
                 },
                 {
                     "indexed": false,
-                    "name": "_dids",
-                    "type": "uint256[]"
-                },
-                {
-                    "indexed": false,
-                    "name": "errcode",
-                    "type": "uint256"
-                },
-                {
-                    "indexed": false,
-                    "name": "info",
-                    "type": "string"
+                    "name": "ripemd160_hash",
+                    "type": "address[]"
                 }
             ],
-            "name": "logReturnDocID",
+            "name": "log_list_id",
             "type": "event"
         },
         {
             "constant": true,
-            "inputs": [
-                {
-                    "name": "_ordID",
-                    "type": "address"
-                },
-                {
-                    "name": "_patID",
-                    "type": "address"
-                }
-            ],
-            "name": "checkPermissionOfOrgsWithPatient",
-            "outputs": [
-                {
-                    "name": "status",
-                    "type": "uint256"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
             "inputs": [],
-            "name": "getAllOrgs",
-            "outputs": [
-                {
-                    "name": "oIds",
-                    "type": "address[]"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [],
-            "name": "getAllPatients",
-            "outputs": [
-                {
-                    "name": "pids",
-                    "type": "address[]"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [],
-            "name": "getFee",
+            "name": "get_fee",
             "outputs": [
                 {
                     "name": "v",
@@ -301,90 +250,23 @@ module.exports = {
             "constant": true,
             "inputs": [
                 {
-                    "name": "_orgID",
-                    "type": "address"
-                }
-            ],
-            "name": "getOrgName",
-            "outputs": [
-                {
-                    "name": "n",
-                    "type": "string"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [],
-            "name": "getPatientsOfOrg",
-            "outputs": [
-                {
-                    "name": "pids",
-                    "type": "address[]"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [
-                {
-                    "name": "_orgID",
-                    "type": "address"
-                }
-            ],
-            "name": "isOrgAvailable",
-            "outputs": [
-                {
-                    "name": "isOk",
-                    "type": "bool"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [
-                {
-                    "name": "_patId",
-                    "type": "address"
-                }
-            ],
-            "name": "isPatAvailable",
-            "outputs": [
-                {
-                    "name": "isOK",
-                    "type": "bool"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [
-                {
-                    "name": "_patId",
+                    "name": "_oID",
                     "type": "address"
                 },
                 {
-                    "name": "_did",
-                    "type": "uint256"
+                    "name": "_pID",
+                    "type": "address"
                 }
             ],
-            "name": "isPatientDocAvailable",
+            "name": "org_check_permission",
             "outputs": [
                 {
-                    "name": "isOK",
-                    "type": "bool"
+                    "name": "_permsion",
+                    "type": "uint256"
+                },
+                {
+                    "name": "_expiredTime",
+                    "type": "uint256"
                 }
             ],
             "payable": false,
@@ -395,48 +277,42 @@ module.exports = {
             "constant": true,
             "inputs": [
                 {
-                    "name": "_patID",
+                    "name": "_oID",
                     "type": "address"
                 }
             ],
-            "name": "orgGetPatientsDocument",
+            "name": "org_get_info",
             "outputs": [
                 {
-                    "name": "_did",
-                    "type": "uint256[]"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [
-                {
-                    "name": "_patID",
-                    "type": "address"
-                }
-            ],
-            "name": "orgGetPatientsDocumentIsReadable",
-            "outputs": [
-                {
-                    "name": "status",
-                    "type": "uint256"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
-            "inputs": [],
-            "name": "patientGetDesc",
-            "outputs": [
-                {
-                    "name": "v",
+                    "name": "_name",
                     "type": "string"
+                },
+                {
+                    "name": "_last_utc",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "name": "_pID",
+                    "type": "address"
+                }
+            ],
+            "name": "pat_get_info",
+            "outputs": [
+                {
+                    "name": "_name",
+                    "type": "string"
+                },
+                {
+                    "name": "_last_utc",
+                    "type": "uint256"
                 }
             ],
             "payable": false,

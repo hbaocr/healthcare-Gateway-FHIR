@@ -38,11 +38,14 @@ function setup_smartcontract() {
      */
     return window.contract;
 }
-function authen_request() {
-    req_authen_jwt_cookies().then((res) => {
-        window.alert(res.data.message);
-    })
-}
+
+
+
+// function on_org_update_info() {
+//     req_authen_jwt_cookies().then((res) => {
+//         window.alert(res.data.message);
+//     })
+// }
 
 function on_org_fhir_management_menu() {
     //alert('on_org_fhir_management');
@@ -54,19 +57,11 @@ function on_org_fhir_management_menu() {
     })
         .catch(console.error);
 }
-
 function on_patients_fhir_management_menu() {
     alert('on_patients_fhir_management');
     let link = server + "/fhir_org_update";
     return axios.post(link, { 'a': '1' }, configheader);
 }
-//create _did from msg
-function create_did(sender,msg){
-    let _tmp=web3.utils.sha3(msg+''+sender) ;
-    let _tmp_acc=web3.eth.accounts.privateKeyToAccount(_tmp);
-    return _tmp_acc.address.toLowerCase();
-}
-
 
 //to make sure already overide web3@0.20(built-in by metamask) by web3@1.0
 function get_web3_10() {
@@ -170,11 +165,11 @@ function wait_for_receipt(txhash, timeoutsec, cb, periodsec = 5) {
     })
 }
 //================Smartcontract Handle========================
-function get_fee() {
+function getFee() {
     let _fromaddr = web3.currentProvider.selectedAddress;
-    return contract.methods.get_fee().call({ from: _fromaddr });
+    return contract.methods.getFee().call({ from: _fromaddr });
 }
-function org_insert_info(org_info, fee_wei, timeoutsec = 120) {
+function updateOrgRegisterInfo(org_info, fee_wei, timeoutsec = 120) {
     return new Promise((resolve, reject) => {
         let _fromaddr = web3.currentProvider.selectedAddress;
         let opt = {
@@ -183,7 +178,7 @@ function org_insert_info(org_info, fee_wei, timeoutsec = 120) {
             gasPrice: _gasPrice, // default gas price in wei, 20 gwei in this case
             value: fee_wei,//this.web3.utils.toBN(0)//no need transfer with value of ETH
         }
-        contract.methods.org_insert_info(org_info).send(opt)
+        contract.methods.updateOrgRegisterInfo(org_info).send(opt)
             .on('transactionHash', function (hash) {
                 console.log('tx hash : ', hash);
                 wait_for_receipt(hash, timeoutsec, (err, ret) => {
@@ -205,12 +200,12 @@ function org_insert_info(org_info, fee_wei, timeoutsec = 120) {
             })
     });
 }
-function org_get_info(_orgId) {
+function getOrgName(_orgId) {
     let _fromaddr = web3.currentProvider.selectedAddress;
-    return contract.methods.org_get_info(_orgId).call({ from: _fromaddr });
+    return contract.methods.getOrgName(_orgId).call({ from: _fromaddr });
 }
 
-function org_insert_pat_did(_patID,_did,_desc,fee_wei,timeoutsec=120){
+function orgUpdatePatientDocument(_patID,_did,_desc,fee_wei,timeoutsec=120){
     return new Promise((resolve, reject) => {
         let _fromaddr = web3.currentProvider.selectedAddress;
         let opt = {
@@ -219,7 +214,7 @@ function org_insert_pat_did(_patID,_did,_desc,fee_wei,timeoutsec=120){
             gasPrice: _gasPrice, // default gas price in wei, 20 gwei in this case
             value: fee_wei,//this.web3.utils.toBN(0)//no need transfer with value of ETH
         }
-        contract.methods.org_insert_pat_did(_patID,_did,_desc).send(opt)
+        contract.methods.orgUpdatePatientDocument(_patID,_did,_desc).send(opt)
             .on('transactionHash', function (hash) {
                 console.log('tx hash : ', hash);
                 wait_for_receipt(hash, timeoutsec, (err, ret) => {

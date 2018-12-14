@@ -22,7 +22,7 @@ function display_info() {
     web3.eth.getBalance(_from).then((w) => {
         setHTMLTag('txt_balance', w.toString())
     })
-    getFee().then((w) => {
+    get_fee().then((w) => {
         setHTMLTag('txt_fee', w.toString())
     })
     web3.eth.getBlockNumber().then((data) => {
@@ -34,11 +34,16 @@ function display_info() {
         setHTMLTag('txt_type', data);
     })
 
-    getOrgName(_from).then((inf) => {
-        if (inf == "") {
+    org_get_info(_from).then((inf) => {
+        if (inf._name == "") {
             setHTMLTag('txt_orgInf', 'Organization has not registered yet');
         } else {
-            setHTMLTag('txt_orgInf', inf);
+            let utc = inf._last_utc;
+            let local_date=""
+            if(utc>0){
+                local_date = new Date(utc*1000).toTimeString();
+            }
+            setHTMLTag('txt_orgInf', inf._name + '@'+local_date);
         }
     });
 }
@@ -54,7 +59,7 @@ function on_org_update_click() {
     let valid_cookies_token_link = MedcontractInfo.gateway_host +'/is_login_legit';
     do_http_post(valid_cookies_token_link,{}).then((isValid)=>{
         if(isValid){
-            return getFee();
+            return get_fee();
         }else{
             window.alert('Token Expired!Please Do Authentication Again ');
         }
@@ -62,7 +67,7 @@ function on_org_update_click() {
     })
     .then((w) => {
         document.getElementById('txt_desc').value = "";
-        return updateOrgRegisterInfo(inf_in, w);
+        return org_insert_info(inf_in, w);
     }).then((evnt) => {
             let ret = {
                 info:inf_in,/**info update to smart contract */

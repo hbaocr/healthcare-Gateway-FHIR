@@ -1,4 +1,4 @@
-//0x03400858AC313fBC9881D86e0dAA9c873f227E8e
+//0xb05a9272fdf033c83758339f37a0290ed65707cf
 
 var sigUtil = require('eth-sig-util');
 var ethUtil = require('ethereumjs-util');
