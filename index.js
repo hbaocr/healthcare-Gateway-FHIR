@@ -16,19 +16,6 @@ var FHIR_REC = require('./FhirRecords');
 var fhir_app = new FHIR(fhir_config.server);
 var fhir_record = new FHIR_REC();
 
-let _did ="0x68f511e06f0ae00a978f015dec55122960480d3d"
-fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
- _did ="0xe1a9c2f56f422c57e4bf8c181d9a7fe616062862"
-fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
- _did ="0xf2d872fa530e9fa6dcefddafed5262bcae25ce92"
-fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
- _did ="0xce01d8dfc20724db9b1f7536b6e1bd0dc34a8058"
-fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
- _did ="0x28e6e9fdd543b82b52c157925e84e5677e17c254"
-fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
-
-
-
 function validiate_receipt(txid, _from, _to, _exp_blockgap) {
 
     var promise0 = web3.eth.getBlockNumber();
@@ -97,7 +84,8 @@ function verify_signature(msg, sig, verifying_addr) {
 
 }
 var app = express_app.setup();
-express_app.begin(app, "0.0.0.0", 8000);
+express_app.begin(app, "0.0.0.0", 8080);
+
 app.post('/jwt_authen', function (req, res) {
     let msg_signed = MedcontractInfo.msg_signed;
     let sig = req.body.signed;
@@ -294,7 +282,13 @@ app.post('/fhir_org_read_pat_did', async (req, response) => {
                             //---> try to sove promise with separate catch error
                             for(let i=len-1;i>=0;i--){
                                 let _did=_didArray[i];
-                                let promise = fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did);
+                                //if err then catch and log to console
+                                let promise = fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).catch((err)=>{
+                                    console.error('-------------------------This Doc not available--------------------------------------');
+                                    console.error(err);
+                                    console.error('-------------------------------------------------------------------------------------');
+
+                                });
                                 promiseArray.push(promise);
                             }
                             return Promise.all(promiseArray);
@@ -318,7 +312,26 @@ app.post('/fhir_org_read_pat_did', async (req, response) => {
             }
         })
         .then((_didResp)=>{
-            console.log(_didResp);
+            let report_docs= _didResp.map((fhir_rec)=>{
+                if(fhir_rec){
+                    if(fhir_rec.status==200){
+                        let _doc={
+                            meta:fhir_rec.data.meta,
+                            patient:fhir_rec.data.patient.reference,
+                            org:fhir_rec.data.accession.assigner.reference,
+                            report:fhir_rec.data.text.div,
+                        }
+                        return _doc;
+                    }
+                }
+            })
+            let resp = {
+                isValid: true,
+                msg: 'Success to get FHIR documents',
+                details: report_docs,
+            }
+            response.json(resp);
+            console.log('---> success to get report');
         })
         .catch((err) => {
                 let r = {

@@ -202,18 +202,16 @@ function on_org_checkout_patient_report_click(){
         }
     })
     .then((_res)=>{
+        let disp=_res.data.msg;
+        window.alert(disp);
         if(_res.data.isValid){
-            let disp='Success to Insert new documents to patient'+"\n"+
-            'document_id : '+_did;
-            console.log(disp);
-            window.alert(disp);
-        }else{
-            window.alert('Update Blockchain Ok but FHIR failed');
+            let _rp=_res.data.details;
+            document.getElementById('txt_read_report').value=JSON.stringify(_rp);
         }
         console.log(_res);
     })
     .catch((err)=>{
-        window.alert('Update failed '+err.toString());
+        window.alert('Read failed '+err.toString());
         console.error(err);
     })
 }
