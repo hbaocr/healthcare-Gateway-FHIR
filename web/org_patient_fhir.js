@@ -206,7 +206,22 @@ function on_org_checkout_patient_report_click(){
         window.alert(disp);
         if(_res.data.isValid){
             let _rp=_res.data.details;
-            document.getElementById('txt_read_report').value=JSON.stringify(_rp);
+            let my_tbl=[];
+            //document.getElementById('txt_read_report').value=JSON.stringify(_rp);
+            for(let i=0;i<_rp.length;i++){
+                if(_rp[i]){
+                    let row={
+                        OrgID:_rp[i].org,
+                        Date:_rp[i].meta.lastUpdated,
+                        Report:JSON.parse(_rp[i].report).report
+                    }
+                    my_tbl.push(row);
+                }
+            }
+            console.log(my_tbl);
+            $('#tbl_patient_report').bootstrapTable({
+                columns: my_tbl
+            });
         }
         console.log(_res);
     })

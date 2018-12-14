@@ -9,6 +9,8 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk="
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/abi-decoder@1.2.0/dist/abi-decoder.js"></script>
@@ -120,9 +122,25 @@
             <div class="panel-body">
                 <form>
                     <div class="form-group">
-                        <button type="button" class="btn btn-primary btn-block" onclick="on_org_checkout_patient_report_click()">Read Patient Reports</button>
+                        <button type="button" class="btn btn-primary btn-block" onclick="on_org_checkout_patient_report_click()">Read
+                            Patient Reports</button>
+                        <!--
                         <label for="txt_read_report">Patient Report</label>
+                      
                         <textarea class="form-control" rows="20" id="txt_read_report"></textarea><br />
+                        -->
+
+                        <label for="tbl_patient_report">Patient Report</label>
+                        <table id="tbl_patient_report" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th data-field="Date" class="col-md-2">OrgID</th>
+                                    <th data-field="OrgID" class="col-md-2">Date</th>
+                                    <th data-field="Report" class="col-md-8">Report</th>
+                                </tr>
+                            </thead>
+                        </table>
+
                     </div>
                 </form>
             </div>
