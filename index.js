@@ -16,6 +16,18 @@ var FHIR_REC = require('./FhirRecords');
 var fhir_app = new FHIR(fhir_config.server);
 var fhir_record = new FHIR_REC();
 
+let _did ="0x68f511e06f0ae00a978f015dec55122960480d3d"
+fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
+ _did ="0xe1a9c2f56f422c57e4bf8c181d9a7fe616062862"
+fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
+ _did ="0xf2d872fa530e9fa6dcefddafed5262bcae25ce92"
+fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
+ _did ="0xce01d8dfc20724db9b1f7536b6e1bd0dc34a8058"
+fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
+ _did ="0x28e6e9fdd543b82b52c157925e84e5677e17c254"
+fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).then(console.log);
+
+
 
 function validiate_receipt(txid, _from, _to, _exp_blockgap) {
 
@@ -181,6 +193,7 @@ app.post('/fhir_org_update', async (req, response) => {
     }
 
 })
+//insert DID
 app.post('/fhir_org_insert_patient', async (req, response) => {
     //let cookie = req.cookies;
     let fhirtoken = req.cookies.fhirtoken;
@@ -192,7 +205,7 @@ app.post('/fhir_org_insert_patient', async (req, response) => {
         let from = req.body.from;
         let _did = req.body.did;
         let _patid = req.body.patID;
-        validiate_receipt(txid, from, MedcontractInfo.address, 20).then((ret) => {
+        validiate_receipt(txid.toLowerCase(), from.toLowerCase(), MedcontractInfo.address.toLowerCase(), 20).then((ret) => {
             if (ret.isValid) {
                 let web_url = req.path;
                 let desc = {
@@ -229,6 +242,85 @@ app.post('/fhir_org_insert_patient', async (req, response) => {
             }
         })
             .catch((err) => {
+                let r = {
+                    isValid: false,
+                    msg: 'request error',
+                    details: err,
+                }
+                response.json(r);
+                console.error(err);
+            })
+    } else {
+        let r = {
+            isValid: false,
+            msg: 'Expired Time--> Try to Authen Again',
+            details: '',
+        }
+        response.json(r);
+        console.error('fhir_org_update-->cookies error');
+    }
+})
+//read DID
+app.post('/fhir_org_read_pat_did', async (req, response) => {
+
+    //let cookie = req.cookies;
+    let fhirtoken = req.cookies.fhirtoken;
+    let pass = app.get('PassJwt');
+    let is_login = await express_app.jwt_verify(fhirtoken, pass);
+    if (is_login) {
+        let _txid = req.body.txid;
+        let _from = req.body.from;
+        let _did = req.body.did;
+        let _patid = req.body.patID;
+        let max_block_delay=50;
+        let r = {
+            isValid: false,
+            msg: 'invalid valid txid',
+            details: '',
+        }
+        validiate_receipt(_txid.toLowerCase(), _from.toLowerCase(),MedcontractInfo.address.toLowerCase(), max_block_delay).then((ret) => {
+            if (ret.isValid) {
+                let _receipt=ret.details[1].receipt[0];
+                if(_receipt.events[1].value ==0){ //valid receipt
+                    if(_patid.toLowerCase()==_receipt.events[3].value.toLowerCase()){ //valid _patID
+                        let _didArray =_receipt.events[4].value;
+                        let len=_didArray.length;
+                        let promiseArray=[];
+                        if(len<=0){
+                            r.msg='There are no records return';
+                            r.isValid=false;
+                        }else{
+                            //hbaocr here---> continue with error on promise with some thing wrong on the middle of process
+                            //---> try to sove promise with separate catch error
+                            for(let i=len-1;i>=0;i--){
+                                let _did=_didArray[i];
+                                let promise = fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did);
+                                promiseArray.push(promise);
+                            }
+                            return Promise.all(promiseArray);
+                        }
+            
+                    }else{
+                        r.msg='Invalid target patient = '+_patid.toLowerCase();
+                        r.isValid=false;
+                    }
+                }else{
+                    r.msg='Invalid Receipt. Error code = '+_receipt.events[1].value;
+                    r.isValid=false;
+                }
+
+                response.json(r);
+            } else {
+                r.msg='Invalid Receipt';
+                r.isValid=false;
+                console.error('Invalid Txid');
+                response.json(r);
+            }
+        })
+        .then((_didResp)=>{
+            console.log(_didResp);
+        })
+        .catch((err) => {
                 let r = {
                     isValid: false,
                     msg: 'request error',

@@ -78,8 +78,7 @@ function display_info() {
 
 }
 
-function on_submit_patient_report_click(){
-    //window.alert('you are here');
+function on_org_submit_patient_report_click(){
     let _from=get_selected_addr();
     let _report = document.getElementById('txt_report').value;
     let _patId=document.getElementById('txt_patID').value;
@@ -98,7 +97,10 @@ function on_submit_patient_report_click(){
             return;
         }
     }
-    _report = _report+"\nUTC timestamp: "+ Date.now().toString();//add time to report
+    _report = _report
+    +"\nCreated by    : "+ _from
+    +"\nPatient       : "+ _patId
+    +"\nUTC timestamp : "+ Date.now().toString();//add time to report
     document.getElementById('txt_report').value=_report;
 
     let _did=create_did(_from,_report);
@@ -138,6 +140,65 @@ function on_submit_patient_report_click(){
             'Result : ' + ret.ret_msg;
             console.log(disp);
             alert(disp);
+        }
+    })
+    .then((_res)=>{
+        if(_res.data.isValid){
+            let disp='Success to Insert new documents to patient'+"\n"+
+            'document_id : '+_did;
+            console.log(disp);
+            window.alert(disp);
+        }else{
+            window.alert('Update Blockchain Ok but FHIR failed');
+        }
+        console.log(_res);
+    })
+    .catch((err)=>{
+        window.alert('Update failed '+err.toString());
+        console.error(err);
+    })
+}
+
+function on_org_checkout_patient_report_click(){
+    let _from=get_selected_addr();
+    let _pID= document.getElementById('txt_patID').value.toLowerCase();
+    let isValid = web3.utils.isAddress(_pID);
+    if(isValid==false){
+        window.alert("Please insert the vailid Patient address");
+        return;
+    }
+    let valid_cookies_token_link = MedcontractInfo.gateway_host +'/is_login_legit';
+    do_http_post(valid_cookies_token_link,{}).then((isValid)=>{
+        if(isValid){
+            return get_fee();
+        }else{
+            window.alert('Login Token Expired!Please Do Authentication Again ');
+            return;
+        }
+    })
+    .then((w) => {
+        //reserve for future when read info also pay (enable)
+        //in this case --> read don't pay
+        
+        return org_read_pat_did(_from,_pID,0,120);
+    })
+    .then((evnt) => {
+
+        if(evnt.receipt[0].events[1].value !=0){ //error code check --> err
+            let disp = 'Event name : ' + evnt.receipt[0].name + "\n" +
+                       'Message    : ' + evnt.receipt[0].events[2].value + "\n" +
+            console.log(disp);
+            alert(disp);
+        }else{
+            //gate way will check the info in receipt through txid
+            let ret ={
+                txid: evnt.transactionHash,
+                //dids: evnt.receipt[0].events[4].value, //maybe need in future to double check
+                from: _from,
+                patID:_pID
+             }
+             let link = MedcontractInfo.gateway_host + '/fhir_org_read_pat_did';
+             return do_http_post(link, ret);
         }
     })
     .then((_res)=>{

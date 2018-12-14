@@ -108,9 +108,9 @@
             <div class="panel-body">
                 <form>
                     <div class="form-group">
-                        <label for="txt_report">Clinic Report</label>
+                        <label for="txt_report">Patient Report</label>
                         <textarea class="form-control" rows="10" id="txt_report"></textarea><br />
-                        <button type="button" class="btn btn-primary btn-block" onclick="on_submit_patient_report_click()">Submit</button>
+                        <button type="button" class="btn btn-primary btn-block" onclick="on_org_submit_patient_report_click()">Submit</button>
                     </div>
                 </form>
             </div>
@@ -119,7 +119,11 @@
         <div class="panel panel-default" id="readPatData">
             <div class="panel-body">
                 <form>
-                    <h4> Read List</h4>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary btn-block" onclick="on_org_checkout_patient_report_click()">Read Patient Reports</button>
+                        <label for="txt_read_report">Patient Report</label>
+                        <textarea class="form-control" rows="20" id="txt_read_report"></textarea><br />
+                    </div>
                 </form>
             </div>
         </div>
