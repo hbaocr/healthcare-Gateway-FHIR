@@ -110,7 +110,9 @@ function req_authen_jwt_cookies() {
         })
 }
 
-
+function setHTMLTagTextColor(tagId,color){
+    document.getElementById(tagId).style.color=color;
+}
 function setHTMLTag(tagId, info_str) {
     document.getElementById(tagId).innerHTML = info_str;
 }
@@ -241,5 +243,10 @@ function org_insert_pat_did(_patID,_did,_desc,fee_wei,timeoutsec=120){
             })
     });
 
+}
+
+function pat_get_info(_pID) {
+    let _fromaddr = web3.currentProvider.selectedAddress;
+    return contract.methods.pat_get_info(_pID).call({ from: _fromaddr });
 }
 

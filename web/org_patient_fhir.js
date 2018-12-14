@@ -11,7 +11,7 @@ window.addEventListener('load', async () => {
         }
        
     }, 5000);
-    
+
 });
 function display_info() {
     web3 = get_web3_10();
@@ -38,7 +38,9 @@ function display_info() {
     org_get_info(_from).then((inf) => {
         if (inf._name == "") {
             setHTMLTag('txt_orgInf', 'Organization has not registered yet');
+            setHTMLTagTextColor('txt_orgInf','red');
         } else {
+            setHTMLTagTextColor('txt_orgInf','black');
             let utc = inf._last_utc;
             let local_date=""
             if(utc>0){
@@ -47,7 +49,35 @@ function display_info() {
             setHTMLTag('txt_orgInf', inf._name + '@'+local_date);
         }
     });
+
+    let _pID= document.getElementById('txt_patID').value.toLowerCase();
+    let isValid = web3.utils.isAddress(_pID);
+    if(isValid){
+        setHTMLTagTextColor('txt_patID','black');
+        if(_pID.indexOf("0x") !=0){
+            _pID="0x"+_pID;
+        }
+        document.getElementById('txt_patID').value=_pID.toLowerCase();
+        pat_get_info(_pID).then((inf) => {
+            if (inf._name == "") {
+                setHTMLTag('txt_patInfo', 'patient not available');
+                setHTMLTagTextColor('txt_patInfo','red');
+            } else {
+                setHTMLTagTextColor('txt_patInfo','black');
+                setHTMLTag('txt_patInfo', inf._name);
+            }
+        });
+
+    }else{
+        setHTMLTagTextColor('txt_patID','red');
+        setHTMLTagTextColor('txt_patInfo','red');
+
+        setHTMLTag('txt_patInfo', "patient not available");
+
+    }
+
 }
+
 function on_submit_patient_report_click(){
     //window.alert('you are here');
     let _from=get_selected_addr();
