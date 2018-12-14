@@ -112,13 +112,22 @@ contract FHIRServices{
         owner_name=_name;
     }
     // withdraw  ETH from this service
-    function withdraw(uint256 howmuch) private {
-        require(msg.sender==owner);
-        msg.sender.transfer(howmuch);
+    function withdraw(uint256 howmuch) public payable {
+        if(msg.sender==owner){
+           msg.sender.transfer(howmuch);
+            log_alarm_info(msg.sender,status_OK,"service owner withdraw money",owner,0);
+        }else{
+            log_alarm_info(msg.sender,status_ERR,"Only owner can withdraw fee",owner,0);
+        }
     }
-    function set_fee(uint256 howmuch) private {
-        require(msg.sender==owner);
-        fee=howmuch;
+    function set_fee(uint256 howmuch) public {
+        if(msg.sender==owner){
+            fee=howmuch;
+            log_alarm_info(msg.sender,status_OK,"New fee Update",owner,0);
+
+        }else{
+            log_alarm_info(msg.sender,status_ERR,"Only owner can change the fee",owner,0);
+        }
     }
     function get_fee() view public returns( uint256 v){
         return fee;
@@ -162,6 +171,7 @@ contract FHIRServices{
         address _pID = msg.sender;
         log_list_id(_pID,status_OK,"All Clinic ID",_pID,pat_docIDs[_pID].member_list);
     }
+    
     function org_insert_info(string _name) public payable{
         if(msg.value < fee){
              log_alarm_info(msg.sender,status_ERR,"not enough fee",owner,0);
@@ -209,9 +219,7 @@ contract FHIRServices{
             log_alarm_info(msg.sender,status_ERR,"Org not available",owner,0);
             return;
         }     
-            
-       
-         Info memory _info;
+        Info memory _info;
         _info.created_by = msg.sender;
         _info.last_utc=block.timestamp;
         insert(org_pat_dIDs[msg.sender],_pID,_info);
