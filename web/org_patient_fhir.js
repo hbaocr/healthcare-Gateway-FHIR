@@ -101,10 +101,13 @@ function on_org_submit_patient_report_click(){
             return;
         }
     }
-    _report = _report
-    +"\nCreated by    : "+ _from
-    +"\nPatient       : "+ _patId
-    +"\nUTC timestamp : "+ Date.now().toString();//add time to report
+
+    // _report = _report 
+    // +"\n"
+    // +"\nCreated by    : "+ _from
+    // +"\nPatient       : "+ _patId
+    // +"\nUTC timestamp : "+ Date.now().toString();//add time to report
+    
     document.getElementById('txt_report').value=_report;
 
     let _did=create_did(_from,_report);
@@ -223,13 +226,13 @@ function on_org_checkout_patient_report_click(){
         if(_res.data.isValid){
             let _rp=_res.data.details;
             let my_tbl=[];
-
             for(let i=0;i<_rp.length;i++){
                 if(_rp[i]){
+                    let dstr = new Date(_rp[i].meta.lastUpdated);
                     let row={
-                        OrgID:_rp[i].org,
-                        Date:_rp[i].meta.lastUpdated,
-                        Report:JSON.parse(_rp[i].report).report
+                        OrgID:_rp[i].org.replace('Organization/',''),
+                        Date:dstr.toLocaleString(),
+                        Report:JSON.parse(_rp[i].report).report.replace("\n","<br/>")
                     }
                     my_tbl.push(row);
                 }
