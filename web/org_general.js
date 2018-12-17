@@ -4,12 +4,14 @@ window.addEventListener('load', async () => {
     if(display_info){
         display_info();
     }
+    authen_request();//request to signed and authen
     setInterval(() => {
         if(display_info){
             display_info();
         }
        
     }, 5000);
+
 });
 
 function display_info() {

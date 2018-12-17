@@ -84,7 +84,7 @@ function verify_signature(msg, sig, verifying_addr) {
 
 }
 var app = express_app.setup();
-express_app.begin(app, "0.0.0.0", 8080);
+express_app.begin(app, "0.0.0.0", MedcontractInfo.web_port);
 
 app.post('/jwt_authen', function (req, res) {
     let msg_signed = MedcontractInfo.msg_signed;
@@ -284,9 +284,9 @@ app.post('/fhir_org_read_pat_did', async (req, response) => {
                                 let _did=_didArray[i];
                                 //if err then catch and log to console
                                 let promise = fhir_app.get_data_fhir(fhir_app.FHIRservice.ImagingStudy,_did).catch((err)=>{
-                                    console.error('-------------------------This Doc not available--------------------------------------');
-                                    console.error(err);
-                                    console.error('-------------------------------------------------------------------------------------');
+                                    //console.error('-------------------------This Doc not available--------------------------------------');
+                                    //console.error(err);
+                                    //console.error('-------------------------------------------------------------------------------------');
 
                                 });
                                 promiseArray.push(promise);

@@ -5,6 +5,7 @@ window.addEventListener('load', async () => {
     if(display_info){
         display_info();
     }
+    //authen_request();//request to signed and authen
     setInterval(() => {
         if(display_info){
             display_info();
@@ -207,7 +208,7 @@ function on_org_checkout_patient_report_click(){
         if(_res.data.isValid){
             let _rp=_res.data.details;
             let my_tbl=[];
-            //document.getElementById('txt_read_report').value=JSON.stringify(_rp);
+
             for(let i=0;i<_rp.length;i++){
                 if(_rp[i]){
                     let row={
@@ -231,7 +232,11 @@ function on_org_checkout_patient_report_click(){
                     field: 'Report',
                     title: 'Report'
                 }],
-                data: my_tbl
+                data: my_tbl,
+                onLoadSuccess: function(){ //not work need to be fixed
+                    console.log('Load OK');
+                    $('.fixed-table-loading').hide();
+                  },
             });
         }
         console.log(_res);
