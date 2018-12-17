@@ -353,4 +353,68 @@ app.post('/fhir_org_read_pat_did', async (req, response) => {
     }
 })
 
+app.post('/fhir_pat_update', async (req, response) => {
+    //let cookie = req.cookies;
+    let fhirtoken = req.cookies.fhirtoken;
+    let pass = app.get('PassJwt');
+    let is_login = await express_app.jwt_verify(fhirtoken, pass);
+    if (is_login) {
+        let txid = req.body.txid;
+        let pat_inf = req.body.info;
+        let from = req.body.from;
+        validiate_receipt(txid, from, MedcontractInfo.address, 20).then((ret) => {
+            if (ret.isValid) {
+                let web_url = req.path;
+                let desc = {
+                    info: 'this is test Infomation of patients. And can be more details',
+                    desc: pat_inf,
+                    contract: MedcontractInfo.address
+                }
+                let div_str = JSON.stringify(desc);
+                //let rec = fhir_record.create_org_json_info(from, pat_inf, web_url, "test@abc.com", "+84.9878987913", "Dist1 NguyenDu", div_str);
+                let rec = fhir_record.create_patient_json_info(from,"test_fname","test_gname","test_gender","xx.xxxxxx","patient@test.com","Nguyen Du-Dist1",from,"www.patientstorage.app.endpoint.com","org my self",div_str);
+                
+                fhir_app.update_data_fhir(fhir_app.FHIRservice.Patient, rec).then((ret) => {
+                    console.log('Patient updating.....');
+                    let r = {
+                        isValid: true,
+                        msg: 'valid txid',
+                        details: ret,
+                    }
+                    if ((ret.status == 200) || (ret.status == 201)) {
+                        r.isValid = true;
+                    } else {
+                        r.isValid = false;
+                    }
+                    response.json(r);
+                })
+            } else {
+                let r = {
+                    isValid: false,
+                    msg: 'invalid txid',
+                    details: ret,
+                }
+                console.log('Invalid Txid');
 
+                response.json(r);
+            }
+        })
+            .catch((err) => {
+                let r = {
+                    isValid: false,
+                    msg: 'request error',
+                    details: err,
+                }
+                response.json(r);
+                console.error(err);
+            })
+    } else {
+        let r = {
+            isValid: false,
+            msg: 'Expired Time--> Try to Authen Again',
+            details: '',
+        }
+        response.json(r);
+        console.error('fhir_pat_update-->cookies error');
+    }
+})

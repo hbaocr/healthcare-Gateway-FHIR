@@ -34,27 +34,38 @@ function display_info() {
         setHTMLTag('txt_type', data);
     })
 
-    org_get_info(_from).then((inf) => {
+    pat_get_info(_from).then((inf) => {
         if (inf._name == "") {
-            setHTMLTag('txt_orgInf', 'Organization has not registered yet');
+            setHTMLTag('txt_patInf', 'Patient has not registered yet');
         } else {
             let utc = inf._last_utc;
             let local_date=""
             if(utc>0){
                 local_date = new Date(utc*1000).toTimeString();
             }
-            setHTMLTag('txt_orgInf', inf._name + '@'+local_date);
+            setHTMLTag('txt_patInf', inf._name + '@'+local_date);
         }
     });
 }
 
-function on_org_update_click() {
+function on_patient_update_click() {
     let _from=get_selected_addr();
     let inf_in = document.getElementById('txt_desc').value;
     if (inf_in == "") {
-        alert("Input organization Info before doing update");
+        alert("Input Patient Info before doing update");
+        setHTMLTagTextColor('txt_desc','red');
         return;
     }
+    setHTMLTagTextColor('txt_desc','black');
+
+    let _pname="";
+    let _paddr="";
+    let _pnumner="";
+    let _pmail="";
+    //  _pname=document.getElementById('txt_name').value;
+    //  _paddr=document.getElementById('txt_addr').value;
+    //  _pnumner=document.getElementById('txt_phone').value;
+    //  _pmail=document.getElementById('txt_mail').value;
 
     let valid_cookies_token_link = MedcontractInfo.gateway_host +'/is_login_legit';
     do_http_post(valid_cookies_token_link,{}).then((isValid)=>{
@@ -66,11 +77,15 @@ function on_org_update_click() {
       
     })
     .then((w) => {
-        document.getElementById('txt_desc').value = "";
-        return org_insert_info(inf_in, w);
+        //document.getElementById('txt_desc').value = "";
+        return pat_insert_info(inf_in, w);
     }).then((evnt) => {
             let ret = {
                 info:inf_in,/**info update to smart contract */
+                pname:_pname,
+                paddr:_paddr,
+                pnumner:_pnumner,
+                pmail:_pmail,
                 txid: evnt.transactionHash,
                 from: _from,
                 ret_msg: evnt.receipt[0].events[2].value,
@@ -79,7 +94,7 @@ function on_org_update_click() {
             }
 
             if (ret.err_code == 0) { //* update block chain OK */
-                let link = MedcontractInfo.gateway_host + '/fhir_org_update';
+                let link = MedcontractInfo.gateway_host + '/fhir_pat_update';
                 return do_http_post(link, ret);
             } else {
                 let disp = 'Event name :' + ret.event_name + "\n" +
@@ -91,7 +106,7 @@ function on_org_update_click() {
         })
         .then((_res) => { //do_http_post handle
             if(_res.data.isValid){
-                window.alert('Success to Update Organization');
+                window.alert('Success to Update Patient');
             }else{
                 window.alert('Update Blockchain Ok but FHIR failed');
             }

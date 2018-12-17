@@ -245,11 +245,6 @@ function org_insert_pat_did(_patID,_did,_desc,fee_wei,timeoutsec=120){
 
 }
 
-function pat_get_info(_pID) {
-    let _fromaddr = web3.currentProvider.selectedAddress;
-    return contract.methods.pat_get_info(_pID).call({ from: _fromaddr });
-}
-
 function org_read_pat_did(_oID,_pID,fee_wei=0,timeoutsec=120){
     return new Promise((resolve, reject) => {
         let _fromaddr = _oID;//web3.currentProvider.selectedAddress;
@@ -280,4 +275,40 @@ function org_read_pat_did(_oID,_pID,fee_wei=0,timeoutsec=120){
                 });
             })
     });
+}
+
+function pat_insert_info(pat_info, fee_wei, timeoutsec = 120) {
+    return new Promise((resolve, reject) => {
+        let _fromaddr = web3.currentProvider.selectedAddress;
+        let opt = {
+            from: _fromaddr,
+            gas: _gasLimit,//gas limitted
+            gasPrice: _gasPrice, // default gas price in wei, 20 gwei in this case
+            value: fee_wei,//this.web3.utils.toBN(0)//no need transfer with value of ETH
+        }
+        contract.methods.pat_insert_info(pat_info).send(opt)
+            .on('transactionHash', function (hash) {
+                console.log('tx hash : ', hash);
+                wait_for_receipt(hash, timeoutsec, (err, ret) => {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    } else {
+                        let res = ret.raw;
+                        let evnt = {
+                            receipt: abiDecoder.decodeLogs(res.logs),
+                            transactionHash: res.transactionHash,
+                            gasUsed: res.cumulativeGasUsed,
+                            blocknum: res.blockNumber
+                        };
+                        console.log(evnt);
+                        resolve(evnt);
+                    }
+                });
+            })
+    });
+}
+function pat_get_info(_pID) {
+    let _fromaddr = web3.currentProvider.selectedAddress;
+    return contract.methods.pat_get_info(_pID).call({ from: _fromaddr });
 }

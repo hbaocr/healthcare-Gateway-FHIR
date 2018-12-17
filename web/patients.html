@@ -14,6 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/abi-decoder@1.2.0/dist/abi-decoder.js"></script>
     <script src="/contract_config.js"></script>
     <script src="/dapp.js"></script>
+    <script src="/patient_general.js"></script>
+
 </head>
 
 <body>
@@ -44,9 +46,59 @@
             </ul>
         
         <br>
-        <p><strong>Note:</strong> This example shows how to create a basic navigation tab. It is not toggleable/dynamic
-            yet (you can't click on the links to display different content)- see the last example in the Bootstrap Tabs
-            and Pills Tutorial to find out how this can be done.</p>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h4>Patient Account Status</h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <h4>Blockchain Status</h4>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="well">
+                            Submit fee : <label id="txt_fee"> Not detect</label> <br />
+                            Balance : <label id="txt_balance"> Not detect</label> <br />
+                            Account : <label id="txt_addr"> Not detect</label> <br />
+                            Description : <label id="txt_patInf"> Not detect</label> <br />
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="well">
+                            API : <label id="txt_web3api"> Not detect</label> <br />
+                            NetworkID : <label id="txt_network"> Not detect</label> <br />
+                            NetworkType: <label id="txt_type"> Not detect</label> <br />
+                            BlockCount : <label id="txt_blocknum"> Not detect</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="txt_desc">Description:</label>
+                    <input type="text" class="form-control" id="txt_desc">
+                    <!-- more details info can be used in future
+                    <label for="txt_name">Name/NickName</label>
+                    <input type="text" class="form-control" id="txt_name">
+                    <label for="txt_addr">Address</label>
+                    <input type="text" class="form-control" id="txt_addr">
+                    <label for="txt_phone">Phone</label>
+                    <input type="text" class="form-control" id="txt_phone">
+                    <label for="txt_mail">Mail</label>
+                    <input type="text" class="form-control" id="txt_mail">
+                    -->
+                   
+                </div>
+                <button type="button" class="btn btn-primary btn-block" onclick="on_patient_update_click()">Update Patient Information</button>
+
+            </div>
+        </div>
     </div>
 
 </body>
