@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -94,7 +97,7 @@
                     <input type="text" class="form-control" id="txt_desc">
 
                 </div>
-                <button type="button" class="btn btn-primary btn-block" onclick="on_org_update_click()">Update Organization
+                <button type="button" class="btn btn-primary btn-block"  id="btn_org_update" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Wait to be confirmed">Update Organization
                     Description</button>
 
             </div>

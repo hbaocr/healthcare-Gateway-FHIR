@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+     <!-- Add icon library -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -108,7 +111,7 @@
                     -->
 
                 </div>
-                <button type="button" class="btn btn-primary btn-block" onclick="on_patient_update_click()">Update
+                <button type="button" class="btn btn-primary btn-block" id="btn_patient_update" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Wait to be confirmed">Update
                     Patient Information</button>
             </div>
         </div>
@@ -161,7 +164,7 @@
 
                                 <div class="form-group">
                                         <div class="col-sm-offset-4 col-sm-8">
-                                            <button type="button" class="form-control btn btn-primary btn-block" onclick="on_patient_allow_click()">Update
+                                            <button type="button" class="form-control btn btn-primary btn-block"  id="btn_patient_allow" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Wait to be confirmed">Update
                                                 Permission</button>
                                         </div>
                                 </div>

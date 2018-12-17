@@ -6,6 +6,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -116,7 +119,7 @@
                     <div class="form-group">
                         <label for="txt_report">Patient Report</label>
                         <textarea class="form-control" rows="10" id="txt_report"></textarea><br />
-                        <button type="button" class="btn btn-primary btn-block" onclick="on_org_submit_patient_report_click()">Submit</button>
+                        <button type="button" class="btn btn-primary btn-block"  id="btn_org_submit_patient_report" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Wait to be confirmed">Submit</button>
                     </div>
                 </form>
             </div>
@@ -126,7 +129,7 @@
             <div class="panel-body">
                 <form>
                     <div class="form-group">
-                        <button type="button" class="btn btn-primary btn-block" onclick="on_org_checkout_patient_report_click()">Read
+                        <button type="button" class="btn btn-primary btn-block" id="btn_org_read_patient_report" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Wait to be confirmed">Read
                             Patient Reports</button>
                         <!--
                         <label for="txt_read_report">Patient Report</label>

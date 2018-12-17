@@ -13,6 +13,9 @@ window.addEventListener('load', async () => {
         }
     }, 5000);
 
+   
+    $("#btn_patient_update").click(on_patient_update_click);
+    $("#btn_patient_allow").click(on_patient_allow_click);
 
 });
 
@@ -79,6 +82,7 @@ function get_permission_value(){
 }
 
 function on_patient_update_click() {
+    let $btn = $(this);
     let _from = get_selected_addr();
     let inf_in = document.getElementById('txt_desc').value;
     if (inf_in == "") {
@@ -96,12 +100,13 @@ function on_patient_update_click() {
     //  _paddr=document.getElementById('txt_addr').value;
     //  _pnumner=document.getElementById('txt_phone').value;
     //  _pmail=document.getElementById('txt_mail').value;
-
+    $btn.button('loading'); 
     let valid_cookies_token_link = MedcontractInfo.gateway_host + '/is_login_legit';
     do_http_post(valid_cookies_token_link, {}).then((isValid) => {
         if (isValid) {
             return get_fee();
         } else {
+            $btn.button('reset');
             window.alert('Token Expired!Please Do Authentication Again ');
         }
 
@@ -127,6 +132,7 @@ function on_patient_update_click() {
                 let link = MedcontractInfo.gateway_host + '/fhir_pat_update';
                 return do_http_post(link, ret);
             } else {
+                $btn.button('reset');
                 let disp = 'Event name :' + ret.event_name + "\n" +
                     'TxID   : ' + ret.txid + "\n" +
                     'Result : ' + ret.ret_msg;
@@ -140,9 +146,11 @@ function on_patient_update_click() {
             } else {
                 window.alert('Update Blockchain Ok but FHIR failed');
             }
+            $btn.button('reset');
             console.log(_res);
         })
         .catch((err) => {
+            $btn.button('reset');
             window.alert('Update failed ' + err.toString());
             console.error(err);
         });
@@ -203,6 +211,7 @@ function display_org_permission_info() {
 }
 
 function on_patient_allow_click(){
+    let $btn = $(this);
     let _from = get_selected_addr();
     let _utc = get_utc_time_expried();
     
@@ -224,18 +233,20 @@ function on_patient_allow_click(){
     let _oID = document.getElementById('txt_orgID').value.toLowerCase();
     let isValid = web3.utils.isAddress(_oID);
     if(isValid){
-
+        $btn.button('loading'); 
         let valid_cookies_token_link = MedcontractInfo.gateway_host + '/is_login_legit';
         do_http_post(valid_cookies_token_link, {}).then((isValid) => {
         if (isValid) {
            return org_get_info(_oID);
         } else {
+            $btn.button('reset');
             window.alert('Token Expired!Please Do Authentication Again ');
         }
         })
         .then((inf) => {
                 if (inf._name == "") {
                     alert('Org was not registered before');
+                    $btn.button('reset');
                 } else {
                     console.log('Selected org:  ',_oID);
                     return get_fee();
@@ -256,13 +267,16 @@ function on_patient_allow_click(){
             }
             console.log(evnt);
             alert(ret.ret_msg);
+            $btn.button('reset');
 
         })
         .catch((err)=>{
             console.error(err);
+            $btn.button('reset');
         })
     }else{
-        alert('Invalid orgID')
+        alert('Invalid orgID');
+        $btn.button('reset');
     }
       
 }
