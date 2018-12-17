@@ -1,3 +1,4 @@
+
 window.addEventListener('load', async () => {
     await on_page_load();
     setup_smartcontract();
@@ -14,6 +15,7 @@ window.addEventListener('load', async () => {
 
 
 });
+
 
 function display_info() {
     web3 = get_web3_10();
@@ -50,11 +52,30 @@ function display_info() {
         }
     });
 }
-function get_exp_time_input(){
-    //doctimepicker_exp
-    let timepicker=document.getElementById('timepicker_exp');
-    let val=timepicker.datetimepicker();
-    console.log(val);
+function get_utc_time_expried(){
+    
+    let date_str= document.getElementById('txt_exp_time').value;
+    if(date_str=="") return 0;
+    let date = new Date(date_str);
+    let utc_sec= Math.floor(date.getTime()/1000);
+    return utc_sec;
+}
+
+function get_permission_value(){
+    
+    let per=document.getElementById('cb_update_permission').value;
+    if(per=="Read and Write"){
+        return 1;
+    }
+    if(per=="Forbid/Reject"){
+        return 2;
+    }
+    if(per=="Full Access"){
+        return 5;
+    }
+
+    return 6;//invalid permission
+
 }
 
 function on_patient_update_click() {
@@ -180,4 +201,71 @@ function display_org_permission_info() {
         setHTMLTag('txt_orgInf', "org not available");
     }
 }
+
+function on_patient_allow_click(){
+    let _from = get_selected_addr();
+    let _utc = get_utc_time_expried();
+    
+    let _per = get_permission_value();
+    let _per_str =PERMISSION_INFO[_per]
+    if(!_per_str){
+        alert('Patient must input valid permission');
+        return;
+    }
+    
+    console.log('Selected Permission:  ',_per_str);
+
+    if(_utc==0){
+        alert('Patient must input valid Expired Time');
+        return;
+    }
+    console.log('Selected Timestamp:  ',_utc);
+
+    let _oID = document.getElementById('txt_orgID').value.toLowerCase();
+    let isValid = web3.utils.isAddress(_oID);
+    if(isValid){
+
+        let valid_cookies_token_link = MedcontractInfo.gateway_host + '/is_login_legit';
+        do_http_post(valid_cookies_token_link, {}).then((isValid) => {
+        if (isValid) {
+           return org_get_info(_oID);
+        } else {
+            window.alert('Token Expired!Please Do Authentication Again ');
+        }
+        })
+        .then((inf) => {
+                if (inf._name == "") {
+                    alert('Org was not registered before');
+                } else {
+                    console.log('Selected org:  ',_oID);
+                    return get_fee();
+                   
+                }
+        })
+        .then((fee)=>{
+            //fee for user pay to service provider money to allow in future 
+            // now --> not used
+            return pat_allow_org(_oID,_per,_utc);
+        })
+        .then((evnt)=>{
+            let ret = {
+                txid: evnt.transactionHash,
+                ret_msg: evnt.receipt[0].events[2].value,
+                event_name: evnt.receipt[0].name,
+                err_code: evnt.receipt[0].events[1].value,
+            }
+            console.log(evnt);
+            alert(ret.ret_msg);
+
+        })
+        .catch((err)=>{
+            console.error(err);
+        })
+    }else{
+        alert('Invalid orgID')
+    }
+      
+}
+
+
 

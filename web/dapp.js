@@ -318,3 +318,36 @@ function org_check_permission(oID,_pID,fee_wei=0,timeoutsec=120){
     let _fromaddr = web3.currentProvider.selectedAddress;
     return contract.methods.org_check_permission(oID,_pID).call({ from: _fromaddr });
 }
+
+function pat_allow_org(_oID,_permsion,_expiredTime,fee_wei=0,timeoutsec=120){
+    return new Promise((resolve, reject) => {
+        let _fromaddr = web3.currentProvider.selectedAddress;
+        let opt = {
+            from: _fromaddr,
+            gas: _gasLimit,//gas limitted
+            gasPrice: _gasPrice, // default gas price in wei, 20 gwei in this case
+            value: fee_wei,//this.web3.utils.toBN(0)//no need transfer with value of ETH
+        }
+        contract.methods.pat_allow_org(_oID,_permsion,_expiredTime).send(opt)
+            .on('transactionHash', function (hash) {
+                console.log('tx hash : ', hash);
+                wait_for_receipt(hash, timeoutsec, (err, ret) => {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    } else {
+                        let res = ret.raw;
+                        let evnt = {
+                            receipt: abiDecoder.decodeLogs(res.logs),
+                            transactionHash: res.transactionHash,
+                            gasUsed: res.cumulativeGasUsed,
+                            blocknum: res.blockNumber
+                        };
+                        console.log(evnt);
+                        resolve(evnt);
+                    }
+                });
+            })
+    });
+
+}

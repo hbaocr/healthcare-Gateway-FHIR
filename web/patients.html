@@ -6,15 +6,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk="
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/abi-decoder@1.2.0/dist/abi-decoder.js"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+   
+  
+
     <script src="/contract_config.js"></script>
     <script src="/dapp.js"></script>
     <script src="/patient_general.js"></script>
+
+    <script>
+            $( function() {
+              $( "#time_picker_exp" ).datetimepicker();
+            } );
+    </script>
 
 </head>
 
@@ -135,30 +148,16 @@
                                
                                 <div class="form-group">
                                         <label class="control-label col-sm-4" for="time_picker_exp">Expire on</label>
-                                        <div class='col-sm-8'>
-                                               
-                                            <div class='input-group date' id='datetimepicker1'>
-                                                <input type='text' class="form-control" />
+                                        <div class='col-sm-8'>   
+                                            <div class='input-group date' id='time_picker_exp'>
+                                                <input type='text' class="form-control" id="txt_exp_time" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
-                                            </div>
-                                               
+                                            </div>   
                                         </div>
                                         
                                 </div>
-                                
-
-                                <!--
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-4" for="time_picker_exp">Expire on</label>
-                                        <div class="col-sm-8">
-                                            <button type="button" class="form-control btn btn-primary btn-block" onclick="on_patient_allow_click()">Update
-                                                Permission</button>
-                                        </div>
-                                      </div>
-                                  
-                                -->
 
                                 <div class="form-group">
                                         <div class="col-sm-offset-4 col-sm-8">
