@@ -219,8 +219,19 @@ function on_org_checkout_patient_report_click(){
                 }
             }
             console.log(my_tbl);
+
             $('#tbl_patient_report').bootstrapTable({
-                columns: my_tbl
+                columns: [{
+                    field: 'Date',
+                    title: 'Date'
+                }, {
+                    field: 'OrgID',
+                    title: 'OrgID'
+                }, {
+                    field: 'Report',
+                    title: 'Report'
+                }],
+                data: my_tbl
             });
         }
         console.log(_res);
