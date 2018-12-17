@@ -50,6 +50,12 @@ function display_info() {
         }
     });
 }
+function get_exp_time_input(){
+    //doctimepicker_exp
+    let timepicker=document.getElementById('timepicker_exp');
+    let val=timepicker.datetimepicker();
+    console.log(val);
+}
 
 function on_patient_update_click() {
     let _from = get_selected_addr();
@@ -174,3 +180,4 @@ function display_org_permission_info() {
         setHTMLTag('txt_orgInf', "org not available");
     }
 }
+
