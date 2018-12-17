@@ -341,7 +341,7 @@ app.post('/fhir_org_read_pat_did', async (req, response) => {
                 }
                 response.json(r);
                 console.error(err);
-            })
+        })
     } else {
         let r = {
             isValid: false,
