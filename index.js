@@ -1,5 +1,5 @@
 //0xb05a9272fdf033c83758339f37a0290ed65707cf
-
+//0x7711b9b74abeec38f4afae884f9238dc6de971f2
 var sigUtil = require('eth-sig-util');
 var ethUtil = require('ethereumjs-util');
 var mecrec_dapp = require('./med_contract_handler');

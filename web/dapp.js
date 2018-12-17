@@ -2,6 +2,7 @@ const server = MedcontractInfo.gateway_host;
 const signed_msg = MedcontractInfo.msg_signed;
 const _gasLimit = MedcontractInfo._gasLimit;
 const _gasPrice = MedcontractInfo._gasPrice;
+const PERMISSION_INFO=["Write Only","Read and Write","Reject-Forbid","Expired Access","Not used","All Access"];
 var configheader = {
     headers: {
         'Content-Type': 'application/json',
@@ -311,4 +312,9 @@ function pat_insert_info(pat_info, fee_wei, timeoutsec = 120) {
 function pat_get_info(_pID) {
     let _fromaddr = web3.currentProvider.selectedAddress;
     return contract.methods.pat_get_info(_pID).call({ from: _fromaddr });
+}
+
+function org_check_permission(oID,_pID,fee_wei=0,timeoutsec=120){
+    let _fromaddr = web3.currentProvider.selectedAddress;
+    return contract.methods.org_check_permission(oID,_pID).call({ from: _fromaddr });
 }

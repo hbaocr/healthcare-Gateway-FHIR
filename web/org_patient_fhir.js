@@ -45,7 +45,7 @@ function display_info() {
             let utc = inf._last_utc;
             let local_date=""
             if(utc>0){
-                local_date = new Date(utc*1000).toTimeString();
+                local_date = new Date(utc*1000).toLocaleString();
             }
             setHTMLTag('txt_orgInf', inf._name + '@'+local_date);
         }
@@ -72,9 +72,7 @@ function display_info() {
     }else{
         setHTMLTagTextColor('txt_patID','red');
         setHTMLTagTextColor('txt_patInfo','red');
-
         setHTMLTag('txt_patInfo', "patient not available");
-
     }
 
 }
