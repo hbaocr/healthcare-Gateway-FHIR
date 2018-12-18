@@ -101,7 +101,7 @@ app.post("/faucet_handler",async(req,response)=>{
             to:_to,
             gas: _gasLimit,//gas limitted
             gasPrice: _gasPrice, // default gas price in wei, 20 gwei in this case
-            value: web3.utils.toBN(1000000)//no need transfer with value of ETH
+            value: web3.utils.toBN(1000000000000000)// 0.001 ETH
         }
         web3.eth.sendTransaction(_opt)
         .then((receipt)=>{

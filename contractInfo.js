@@ -3,7 +3,7 @@ module.exports = {
     networdID: '122018',
     web_port: 9000,
     gateway_host: 'http://127.0.0.1:9000',
-    fhir_api: 'http://127.0.0.1:3000/3_0_1',
+    fhir_api: 'http://127.0.0.1:3000/3_0_1/',
     block_interval: 100, // for signing change each interval of block ( 100 block signature change) 
     _gasLimit: 1500000,
     _gasPrice: '20000000000',
