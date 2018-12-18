@@ -18,6 +18,6 @@
 
 ---
 
-## Workflow ofread FHIR infomtions
+## Workflow of read FHIR infomtions
 
  ![](FHIReadData.png)
