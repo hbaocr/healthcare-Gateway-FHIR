@@ -12,12 +12,12 @@
 
 ---
 
-## Workflow of insert new FHIR infomtions
+## Workflow of insert new FHIR information
 
  ![](FHIRInsertData.png)
 
 ---
 
-## Workflow of read FHIR infomtions
+## Workflow of read FHIR information
 
  ![](FHIReadData.png)
