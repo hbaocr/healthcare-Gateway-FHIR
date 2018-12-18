@@ -27,3 +27,15 @@
 ## Workflow of read FHIR information
 
  ![](FHIReadData.png)
+
+
+## Live Demo
+
+* Metamask setup 
+    * [Metamask  add-on as a personal wallet](https://metamask.io)
+    * Point to new custom RPC http://3.0.166.183:8545 and network ID 122018
+    * Create new Account
+    * Ask faucet service to get free ETH to your current account on metamask to used in this system http://3.0.228.208:9000/faucet.html
+
+* Run application (make sure you have metamask on your Chrome/Firefox/Brave (Safari  doesn't currently support ))
+    * Visit that  link http://3.0.228.208:9000

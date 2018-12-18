@@ -6,6 +6,7 @@ var mecrec_dapp = require('./med_contract_handler');
 var fs = require('fs');
 var express_app = require('./gateway_app_utils');
 var MedcontractInfo = require("./contractInfo");
+var service_acc = require("./accountInfo");
 
 mecrec_dapp = new mecrec_dapp();
 var web3 = mecrec_dapp.setup_web3_websocket();
@@ -85,6 +86,62 @@ function verify_signature(msg, sig, verifying_addr) {
 }
 var app = express_app.setup();
 express_app.begin(app, "0.0.0.0", MedcontractInfo.web_port);
+
+app.post("/faucet_handler",async(req,response)=>{
+    let fhirtoken = req.cookies.fhirtoken;
+    let pass = app.get('PassJwt');
+    let is_login = await express_app.jwt_verify(fhirtoken, pass);
+    if (is_login) {
+        let _to = req.body.addr;
+        let _from =service_acc.address.toLowerCase();
+        let _gasLimit = MedcontractInfo._gasLimit;
+        let _gasPrice = MedcontractInfo._gasPrice;
+        let _opt = {
+            from: _from,
+            to:_to,
+            gas: _gasLimit,//gas limitted
+            gasPrice: _gasPrice, // default gas price in wei, 20 gwei in this case
+            value: web3.utils.toBN(1000000)//no need transfer with value of ETH
+        }
+        web3.eth.sendTransaction(_opt)
+        .then((receipt)=>{
+            let r = {
+                isValid: true,
+                msg: 'Make Tx is Ok',
+                details: receipt,
+            }
+            response.json(r);
+            console.log('req faucet receipt --> ',receipt);
+        })
+        .catch((err)=>{
+            let r = {
+                isValid: false,
+                msg: 'Make Tx is failed',
+                details: err,
+            }
+            response.json(r);
+
+        })
+        // .on('transactionHash', function(txid){
+        //     mecrec_dapp.wait_for_receipt(web3, txid, 120, (err, ret) => {
+        //         if (err) {
+        //             reject(err);
+        //         } else {
+        //             resolve(ret);
+        //         }
+        //     })
+        // });
+
+    }else{
+        let r = {
+            isValid: false,
+            msg: 'Invalid signature-->Need to authenticate again',
+            details: '',
+        }
+        response.json(r);
+    }
+});
+
 
 app.post('/jwt_authen', function (req, res) {
     let msg_signed = MedcontractInfo.msg_signed;

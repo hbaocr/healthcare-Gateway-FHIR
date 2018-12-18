@@ -8,7 +8,7 @@ var config = require("./config/config");
 var express = require('express');
 var fs = require('fs');
 var MedcontractInfo = require("./contractInfo");
-
+var service_acc = require("./accountInfo");
 
 module.exports = {
     setup: (app_ex) => {
@@ -21,7 +21,7 @@ module.exports = {
             app = express();
         }
         app.use("/", express.static(__dirname + '/web'));//mount root of web to 'web'
-
+        MedcontractInfo.faucet =service_acc.address.toLowerCase();
         let ret = "MedcontractInfo = " + JSON.stringify(MedcontractInfo);
         let pathcontract = __dirname + '/web' + '/contract_config.js';
         console.log('sync up smartcontract setup to web app at  : ', pathcontract);
