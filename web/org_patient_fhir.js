@@ -226,6 +226,9 @@ function on_org_checkout_patient_report_click(){
         if(_res.data.isValid){
             let _rp=_res.data.details;
             let my_tbl=[];
+            $('#tbl_patient_report').bootstrapTable('refresh');
+           
+
             for(let i=0;i<_rp.length;i++){
                 if(_rp[i]){
                     let dstr = new Date(_rp[i].meta.lastUpdated);
@@ -251,10 +254,6 @@ function on_org_checkout_patient_report_click(){
                     title: 'Report'
                 }],
                 data: my_tbl,
-                onLoadSuccess: function(){ //not work need to be fixed
-                    console.log('Load OK');
-                    $('.fixed-table-loading').hide();
-                  },
             });
         }
         console.log(_res);
