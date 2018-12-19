@@ -38,4 +38,6 @@
     * Ask faucet service to get free ETH to your current account on metamask to used in this system http://3.0.228.208:9000/faucet.html
 
 * Run application (make sure you have metamask on your Chrome/Firefox/Brave (Safari  doesn't currently support ))
-    * Visit that  link http://3.0.228.208:9000
+    * Visit this  link http://3.0.228.208:9000
+    * Visit this  link http://3.0.228.208:8000 to  lookup the Txs
+    * Visit this  link http://3.0.228.208:9000/faucet.html to ask for token
